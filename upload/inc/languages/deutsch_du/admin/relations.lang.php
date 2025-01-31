@@ -16,6 +16,8 @@ $l['relations_settings_descr'] = "Einstellungen für Risuenas Relations Plugin";
 $l['relations_settings_alertConfirmTitle'] = "Relations Bestätigung";
 $l['relations_settings_alertConfirmDescr'] = "Müssen Anfragen anderer Charaktere bestätigt werden?";
 
+
+
 $l['relations_settings_alertAlertTitle'] = "Relations Alerts";
 $l['relations_settings_alertAlertDescr'] = "Sollen Alerts überhaupt benutzt werden? Das MyAlerts Plugin muss dafür installiert sein. Ansonsten bitte auch die Bestätigung auf nein stellen.";
 
@@ -39,3 +41,11 @@ $l['relations_settings_mycodeDescr'] = "Darf in der Beschreibung der Relation My
 
 $l['relations_settings_htmlTitle'] = "HTML";
 $l['relations_settings_htmlDescr'] = "Darf in der Beschreibung der Relation html verwendet werden?";
+
+$l['relations_settings_wob'] = "Relations nach WOB?";
+$l['relations_settings_wob_descr'] = "Dürfen Relations erst nach dem WOB gestellt werden?";
+
+$l['relations_settings_group'] = "Bewerbergruppe";
+$l['relations_settings_group_descr'] = "Wie ist die Gruppe für die User die noch nicht angenommen sind?";
+
+$l['relations_permission'] = "Darf Relations im ACP verwalten?";
