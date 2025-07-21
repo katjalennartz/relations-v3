@@ -1334,7 +1334,7 @@ function relations_profile()
     $form_select = relations_getCats($thisuser);
     if ($form_select != "false") {
       if (
-        !is_member($mybb->settings['relas_group'])
+        ( $mybb->settings['relas_nachwob'] == 1 && !is_member($mybb->settings['relas_group']) )
         && $mybb->user['uid'] != 0
         && !is_member(7)
       ) {
@@ -1506,7 +1506,7 @@ function relations_usercp()
   }
 
   if (
-    !is_member($mybb->settings['relas_group'])
+    ($mybb->settings['relas_nachwob'] == 1 && !is_member($mybb->settings['relas_group']))
     && $mybb->user['uid'] != 0
     && !is_member(7)
   ) {
