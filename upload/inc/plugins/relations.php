@@ -1336,7 +1336,7 @@ function relations_profile()
       if ($mybb->user['uid'] != 0 && !is_member(7)) {
 	if ($mybb->settings['relas_nachwob'] == 1) {
         	eval("\$relas_memberprofil_anfrage = \"" . $templates->get("relas_memberprofil_anfrage") . "\";");
-	} else if ($mybb->settings['relas_nachwob'] == 1 && !is_member($mybb->settings['relas_group'])) {
+	} else if ($mybb->settings['relas_nachwob'] == 0 && !is_member($mybb->settings['relas_group'])) {
 		eval("\$relas_memberprofil_anfrage = \"" . $templates->get("relas_memberprofil_anfrage") . "\";");
 	}
       }
@@ -1507,7 +1507,7 @@ function relations_usercp()
 if ($mybb->user['uid'] != 0 && !is_member(7)) {
 	if ($mybb->settings['relas_nachwob'] == 1) {
 		eval("\$relas_ucp_manage = \"" . $templates->get("relas_ucp_manage") . "\";");
-	} else if ($mybb->settings['relas_nachwob'] == 1 && !is_member($mybb->settings['relas_group'])) {
+	} else if ($mybb->settings['relas_nachwob'] == 0 && !is_member($mybb->settings['relas_group'])) {
 		eval("\$relas_ucp_manage = \"" . $templates->get("relas_ucp_manage") . "\";");
 	} else {
 		$relas_ucp_manage = "";
