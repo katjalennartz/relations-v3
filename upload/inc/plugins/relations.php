@@ -1333,12 +1333,12 @@ function relations_profile()
     //Hiermit stellen wir fest, ob der anfragende überhaupt schon kategorien hat.
     $form_select = relations_getCats($thisuser);
     if ($form_select != "false") {
-      if (
-        ( $mybb->settings['relas_nachwob'] == 1 && !is_member($mybb->settings['relas_group']) )
-        && $mybb->user['uid'] != 0
-        && !is_member(7)
-      ) {
-        eval("\$relas_memberprofil_anfrage = \"" . $templates->get("relas_memberprofil_anfrage") . "\";");
+      if ($mybb->user['uid'] != 0 && !is_member(7)) {
+	if ($mybb->settings['relas_nachwob'] == 1) {
+        	eval("\$relas_memberprofil_anfrage = \"" . $templates->get("relas_memberprofil_anfrage") . "\";");
+	} else if ($mybb->settings['relas_nachwob'] == 1 && !is_member($mybb->settings['relas_group'])) {
+		eval("\$relas_memberprofil_anfrage = \"" . $templates->get("relas_memberprofil_anfrage") . "\";");
+	}
       }
     } else {
       $relas_memberprofil_anfrage = "<div class=\"rela-noncats\">Du hast noch keine Kategorien in deinem Profil angelegt. Bitte tu dies zuerst. Dann kannst du Anfragen an andere Charaktere schicken.</div>";
@@ -1503,17 +1503,27 @@ function relations_usercp()
     $hauptkategoriesub = "";
 
     eval("\$relas_ucp_managecat .= \"" . $templates->get("relas_ucp_managecat") . "\";");
-  }
+}
+if ($mybb->user['uid'] != 0 && !is_member(7)) {
+	if ($mybb->settings['relas_nachwob'] == 1) {
+		eval("\$relas_ucp_manage = \"" . $templates->get("relas_ucp_manage") . "\";");
+	} else if ($mybb->settings['relas_nachwob'] == 1 && !is_member($mybb->settings['relas_group'])) {
+		eval("\$relas_ucp_manage = \"" . $templates->get("relas_ucp_manage") . "\";");
+	} else {
+		$relas_ucp_manage = "";
+	}
+}
 
-  if (
-    ($mybb->settings['relas_nachwob'] == 1 && !is_member($mybb->settings['relas_group']))
-    && $mybb->user['uid'] != 0
-    && !is_member(7)
-  ) {
-    eval("\$relas_ucp_manage = \"" . $templates->get("relas_ucp_manage") . "\";");
-  } else {
-    $relas_ucp_manage = "";
-  }
+	
+//  if (
+//    ($mybb->settings['relas_nachwob'] == 1 && !is_member($mybb->settings['relas_group']))
+//    && $mybb->user['uid'] != 0
+//    && !is_member(7)
+//  ) {
+//    eval("\$relas_ucp_manage = \"" . $templates->get("relas_ucp_manage") . "\";");
+//  } else {
+//    $relas_ucp_manage = "";
+//  }
 
   //Verarbeitung der Formulardaten 
   //Standardkategorien erstelle
