@@ -16,8 +16,6 @@ $l['relations_settings_descr'] = "Einstellungen für Risuenas Relations Plugin";
 $l['relations_settings_alertConfirmTitle'] = "Relations Bestätigung";
 $l['relations_settings_alertConfirmDescr'] = "Müssen Anfragen anderer Charaktere bestätigt werden?";
 
-
-
 $l['relations_settings_alertAlertTitle'] = "Relations Alerts";
 $l['relations_settings_alertAlertDescr'] = "Sollen Alerts überhaupt benutzt werden? Das MyAlerts Plugin muss dafür installiert sein. Ansonsten bitte auch die Bestätigung auf nein stellen.";
 
@@ -41,6 +39,18 @@ $l['relations_settings_mycodeDescr'] = "Darf in der Beschreibung der Relation My
 
 $l['relations_settings_htmlTitle'] = "HTML";
 $l['relations_settings_htmlDescr'] = "Darf in der Beschreibung der Relation html verwendet werden?";
+
+$l['relations_settings_birthday'] = "Geburtstag";
+$l['relations_settings_birthdayDescr'] = "Wie ist der Geburtstag des Charakters angegeben?";
+
+$l['relations_settings_birthdayval'] = "Geburtstagfeld ID";
+$l['relations_settings_birthdayvalDescr'] = "Wenn du für den Geburtstag ein Profilfeld verwendest (muss die Form dd.mm.YYYY haben) gebe die ID des Profilfelds ein. Also z.B. 7. Wenn du das Steckbriefplugin verwendest, gebe den eindeutigen Bezeichner ein. Also zum Beispiel 'geburtstag'.";
+
+$l['relations_settings_ingamescene'] = "Risuenas Szenentracker";
+$l['relations_settings_ingamesceneDescr'] = "Benutzt du den Szenentracker von Risu? Dann wird das Alter für die Relaeinträge davon ausgehend berechnet. Du kannst das nächste Feld leer lassen.";
+
+$l['relations_settings_ingametime'] = "Ingamezeitraum";
+$l['relations_settings_ingamesceneDescr'] = "Wenn du den Szenentracker nicht benutzt gebe hier das Datum in der Form: 2025-07-01 an (Jahr - Monat - Tag)."; 
 
 $l['relations_settings_wob'] = "Relations nach WOB?";
 $l['relations_settings_wob_descr'] = "Dürfen Relations erst nach dem WOB gestellt werden?";
