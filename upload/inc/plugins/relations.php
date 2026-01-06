@@ -2706,7 +2706,7 @@ function relations_admin_update_plugin(&$table)
   }
 
   // Zelle mit dem Namen des Themes
-  $table->construct_cell("<b>" . htmlspecialchars_uni("Szenentracker") . "</b>", array('width' => '70%'));
+  $table->construct_cell("<b>" . htmlspecialchars_uni("Relations") . "</b>", array('width' => '70%'));
 
   // Überprüfen, ob Update nötig ist 
   $update_check = relations_is_updated();
@@ -2749,7 +2749,7 @@ function relations_admin_update_stylesheet(&$table)
     admin_redirect("index.php?module=rpgstuff-stylesheet_updates");
   }
   // Zelle mit dem Namen des Themes
-  $table->construct_cell("<b>" . htmlspecialchars_uni("Szenentracker-Manager") . "</b>", array('width' => '70%'));
+  $table->construct_cell("<b>" . htmlspecialchars_uni("Relations-Manager") . "</b>", array('width' => '70%'));
 
   // Ob im Master Style vorhanden
   $master_check = $db->query("SELECT tid FROM " . TABLE_PREFIX . "themestylesheets 
