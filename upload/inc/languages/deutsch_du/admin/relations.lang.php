@@ -1,10 +1,11 @@
 <?php
+
 /**
  * Relations 1.0 Main Language File
  */
 
- //ACP
- //INFOS
+//ACP
+//INFOS
 $l['relations_title'] = "Risuenas Relations Plugin";
 $l['relations_descr'] = "Beziehungen zu anderen Charakteren anlegen. Mit Kategorien und Unterkategorien.";
 
@@ -15,6 +16,7 @@ $l['relations_settings_descr'] = "Einstellungen für Risuenas Relations Plugin";
 
 $l['relations_settings_alertConfirmTitle'] = "Relations Bestätigung";
 $l['relations_settings_alertConfirmDescr'] = "Müssen Anfragen anderer Charaktere bestätigt werden?";
+
 
 $l['relations_settings_alertAlertTitle'] = "Relations Alerts";
 $l['relations_settings_alertAlertDescr'] = "Sollen Alerts überhaupt benutzt werden? Das MyAlerts Plugin muss dafür installiert sein. Ansonsten bitte auch die Bestätigung auf nein stellen.";
@@ -40,18 +42,6 @@ $l['relations_settings_mycodeDescr'] = "Darf in der Beschreibung der Relation My
 $l['relations_settings_htmlTitle'] = "HTML";
 $l['relations_settings_htmlDescr'] = "Darf in der Beschreibung der Relation html verwendet werden?";
 
-$l['relations_settings_birthday'] = "Geburtstag";
-$l['relations_settings_birthdayDescr'] = "Wie ist der Geburtstag des Charakters angegeben?";
-
-$l['relations_settings_birthdayval'] = "Geburtstagfeld ID";
-$l['relations_settings_birthdayvalDescr'] = "Wenn du für den Geburtstag ein Profilfeld verwendest (muss die Form dd.mm.YYYY haben) gebe die ID des Profilfelds ein. Also z.B. 7. Wenn du das Steckbriefplugin verwendest, gebe den eindeutigen Bezeichner ein. Also zum Beispiel 'geburtstag'.";
-
-$l['relations_settings_ingamescene'] = "Risuenas Szenentracker";
-$l['relations_settings_ingamesceneDescr'] = "Benutzt du den Szenentracker von Risu? Dann wird das Alter für die Relaeinträge davon ausgehend berechnet. Du kannst das nächste Feld leer lassen.";
-
-$l['relations_settings_ingametime'] = "Ingamezeitraum";
-$l['relations_settings_ingamesceneDescr'] = "Wenn du den Szenentracker nicht benutzt gebe hier das Datum in der Form: 2025-07-01 an (Jahr - Monat - Tag)."; 
-
 $l['relations_settings_wob'] = "Relations nach WOB?";
 $l['relations_settings_wob_descr'] = "Dürfen Relations erst nach dem WOB gestellt werden?";
 
@@ -59,3 +49,46 @@ $l['relations_settings_group'] = "Bewerbergruppe";
 $l['relations_settings_group_descr'] = "Wie ist die Gruppe für die User die noch nicht angenommen sind?";
 
 $l['relations_permission'] = "Darf Relations im ACP verwalten?";
+
+/*rpg stuff management*/
+$l['relations_acp'] = "Relations";
+$l['relations_acp_overview'] = "Relations Übersicht";
+$l['relations_acp_addcats'] = "Hauptkategorie hinzufügen";
+$l['relations_acp_addsubcats'] = "Subkategorie hinzufügen";
+$l['relations_editcat_success'] = "Die Kategorie wurde erfolgreich bearbeitet.";
+
+$l['relations_warning'] = "Beachte das Änderungen nur für zukünftig angelegte Standardkategorien gelten. User die schon Kategorien erstellt haben, behalten diese und müssen sie manuell bearbeiten wenn nötig.";
+$l['relations_btn_add'] = "Hinzufügen";
+$l['relations_btn_save'] = "Änderungen speichern";
+$l['relations_addcat_name'] = "Name der Kategorie";
+$l['relations_addcat_name_descr'] = "Der Name der Kategorie, z.B. Familie, Freunde, Feinde etc.";
+$l['relations_addcat_name_placeholder'] = "Familie";
+$l['relations_addcat_order'] = "Sortierung";
+$l['relations_addcat_order_descr'] = "Die Sortierung der Kategorie. Je höher die Zahl, desto weiter unten wird die Kategorie angezeigt.";
+$l['relations_addcat_error_noname'] = "Du musst einen Namen für die Kategorie eingeben.";
+$l['relations_addcat_error_exists'] = "Es gibt bereits eine Kategorie mit diesem Namen.";
+$l['relations_addcat_error_longname'] = "Der Name der Kategorie darf nicht länger als 50 Zeichen sein.";
+$l['relations_addcat_success'] = "Die Kategorie wurde erfolgreich angelegt.";
+
+$l['relations_deletecat_success'] = "Die Kategorie wurde erfolgreich gelöscht.";
+
+$l['relations_acp_editmaincat'] = "Hauptkategorie bearbeiten";
+$l['relations_acp_manage_cat'] = "Hauptkategorie verwalten";
+$l['relations_acp_manage_cat_edit'] = "Hauptkategorie bearbeiten";
+$l['relations_addsubcat_error_noname'] = "Du musst einen Namen für die Subkategorie eingeben.";
+$l['relations_addsubcat_error_exists'] = "Es gibt bereits eine Subkategorie mit diesem Namen in dieser Kategorie.";
+$l['relations_addsubcat_error_longname'] = "Der Name der Subkategorie darf nicht länger als 50 Zeichen sein.";
+$l['relations_addsubcat_success'] = "Die Subkategorie wurde erfolgreich angelegt.";
+$l['relations_addsubcat_error_nocat'] = "Du musst eine Hauptkategorie auswählen.";
+$l['relations_addsubcat_name'] = "Name der Subkategorie";
+$l['relations_addsubcat_name_descr'] = "Der Name der Subkategorie, z.B. Eltern, Geschwister, Kinder etc.";
+$l['relations_acp_manage_sub'] = "Subkategorie verwalten";
+$l['relations_addsubcat_maincat'] = "Hauptkategorie";
+$l['relations_addsubcat_maincat_descr'] = "Die Hauptkategorie, zu der die Subkategorie gehört.";
+$l['relations_addsubcat_order'] = "Sortierung";
+$l['relations_addsubcat_order_descr'] = "Die Sortierung der Subkategorie. Je höher die Zahl, desto weiter unten wird die Subkategorie angezeigt.";
+
+$l['relations_acp_editsubcat'] = "Subkategorie bearbeiten";
+$l['relations_editsubcat_success'] = "Die Subkategorie wurde erfolgreich bearbeitet.";
+
+$l['relations_acp_editsubcat'] = "Subkategorie bearbeiten";
