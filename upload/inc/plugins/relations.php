@@ -1774,7 +1774,7 @@ function relations_usercp()
     //fallback, falls in den Einstellungen keine Kategorien hinterlegt wurden
     if (empty($standard)) {
       $standard = array(
-        "family" => "TEST mom,dad,children,siblings,other",
+        "family" => "mom,dad,children,siblings,other",
         "friends" => "best friends,good friends,friends",
         "known" => "like,neutral,dislike",
         "love" => "relationship,well looking,kissed,flirt,one night stand,affair",
