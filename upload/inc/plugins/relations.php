@@ -614,122 +614,127 @@ function relations_addtemplates($type = 'install')
   $templates[] = array(
     "title" => 'relas_ucp_manage',
     "template" => '<h2 class="rela-heading2">Verwaltung</h2>
-          <div class="ucprelas-manage">
-            <div class="ucprelas-manage__item ucprelas-managecats">
-              <h3 class="rela-heading3">Kategorien verwalten</h3>
-              {$relas_ucp_managecat}
-        </div>
-            <div class="ucprelas-manage__item ucprelas-addcats">
-              <div class="ucprelas-addcats__item ">
-                <h3 class="rela-heading3">Standards erstellen</h3>
-                <form  action="usercp.php?action=relations" id="catstandard" method="post" >
-                  {$dostandardcats}
-                </form>
-              </div>
-              <div class="ucprelas-addcats__item ucprelas-addmaincats">
-                <h3 class="rela-heading3">Hauptkategorie erstellen</h3>
-                <form action="usercp.php?action=relations" id="newcat" method="post" >
-                  <label for="addMain">Bezeichnung Hauptkategorie</label>
-                  <input type="text" id="addMain" name="addMain" placeholder="Neue Hauptkategorie" required>
-                  <label for="addMainSort">Darstellungsreihenfolge</label>
-                  <input type="number" id="addMainSort" name="addMainSort" placeholder="Darstellungsreihenfolge">
-                  <input form="newcat" name="newcat" type="submit" value="Speichern" />
-                </form>
-              </div>
-              <div class="ucprelas-addcats__item ucprelas-addsubcats">
-                <h3 class="rela-heading3">Unterkategorie erstellen</h3>
-                <form  action="usercp.php?action=relations" id="newsubcat" method="post" >
-                  <label for="addSub">Bezeichnung Unterkategorie</label>
-                  <input type="text" name="addSub" id="addSub" placeholder="Neue Unterkategorie" required>
-                  <label for="addSubSort">Darstellungsreihenfolge</label>
-                  <input type="number" id="addSubSort" name="addSubSort" placeholder="Darstellungsreihenfolge">
-                  <label for="maincat">Hauptkategorie</label>
-                  {$hauptkategorie}
-                  <input form="newsubcat" name="newsubcat" type="submit" value="Speichern" />
-                </form>
+<div class="ucprelas-manage">
+	<div class="ucprelas-manage__item ucprelas-managecats">
+		<h3 class="rela-heading3">Kategorien verwalten</h3>
+		{$relas_ucp_managecat}
+	</div>
 
-              </div>
-            </div>
-              <div class="ucprelas-manage__item ucprelas-manageoptions">
-              <h3 class="rela-heading3">Einstellungen Alert</h3>
-              <form  action="usercp.php?action=relations" id="relconfirm_save" method="post" >
-                <p>Möchtest du Relations erst bestätigen, bevor sie bei anderen eingetragen werden?</p>
-                <input name="relaconfirm" value="0" type="radio" {$relaconfirm_yes} id="relaconfirmyes">
-                <label for="relaconfirmyes">Ja</label>
-                <input name="relaconfirm" value="1" type="radio" {$relaconfirm_no} id="relaconfirmno">
-                <label for="relaconfirmyes">Nein</label>
-                <input form="relconfirm_save" name="relconfirm_save" type="submit" value="Speichern" />
-              </form>
-            </div>
-            <div class="ucprelas-manage__item ucprelas-addcharas" >
-              <div class="ucprelas-npcform">
-                <form action="usercp.php?action=relations" method="post" >
-                  <h3 class="rela-heading3">NPC hinzufügen</h3>
-                  <div class="ucprelas-npcform__item">
-                    <label for="npcname">Name NPC</label>
-                    <input type="text" name="npcname" placeholder="NPC Name" id="npcname" value="" required>
-                  </div>
-                  <div class="ucprelas-npcform__item">
-                    <label for="npcbirthyear">Geburtsjahr NPC</label>
-                    <input type="number" name="npcbirthyear" placeholder="NPC Geburtsjahr" id="npcbirthyear" value="">
-                  </div>
-                                    <div class="ucprelas-npcform__item">
-                    <label for="npcdeathyear">Todesjahr NPC</label>
-                    <span class="smalltext">Wenn der NPC verstorben ist, gib hier das Todesjahr ein. Sonst einfach 0</span>
-                    <input type="number" name="npcdeathyear" placeholder="NPC Todesjahr" id="npcdeathyear" value="">
-                  </div>
-                  {$img}
-                  <div class="ucprelas-npcform__item">
-                    <label for="npcdescr">Beschreibung</label>
-                    <textarea name="npcdescr" placeholder="Kommentar zur Beziehung" id="npcdescr"></textarea>
-                  </div>
-                  <div class="ucprelas-npcform__item">
-                    <label for="addNpcSort">Darstellungsreihenfolge</label>
-                    <input type="number" id="addNpcSort" name="addNpcSort" placeholder="Darstellungsreihenfolge">
-                  </div>
-                  <div class="ucprelas-npcform__item">
-                    {$cats_npc}
-                  </div>
-                  <div class="ucprelas-npcform__item">
-                    <label>Darf übernommen werden?</label>
-                    <br>
-                    <div style="text-align:center">
-                      <input type="radio" name="rela_searched" checked="" id="e_rela_searched_yes" value="1">
-                      <label for="e_rela_searched_yes"> Ja</label>
-                      <input type="radio" name="rela_searched" id="e_rela_searched_no" value="0">
-                      <label for="e_rela_searched_no"> Nein</label>
-                    </div>
-                  </div>
-                  <div class="ucprelas-npcform__item">
-                    <input type="url" name="searchurl" placeholder="URL zum Gesuch">
-                  </div>
-                  <div class="ucprelas-npcform__item">
-                    <input type="submit" name="addnpc" value="speichern" id="addnpc" />
-                  </div>
-                </form>
-                <form action="usercp.php?action=relations" method="post" id="addachar" >
-                  <h3 class="rela-heading3">add another Character</h3>
-                  <div class="ucprelas-npcform__item">
-                    <input type="text" name="addname" placeholder="Charakter" id="username" value="" required>
-                  </div>
+	<div class="ucprelas-manage__item ucprelas-addcats">
+		<div class="ucprelas-addcats__item ">
+			<h3 class="rela-heading3">Standards erstellen</h3>
+			<form  action="usercp.php?action=relations" id="catstandard" method="post" >
+				{$dostandardcats}
+			</form>
+		</div>
 
-                  <div class="ucprelas-npcform__item">			
-                    <textarea name="addescr" placeholder="Kommentar zur Beziehung" id="npcdescr"></textarea>
-                  </div>
-                  <div class="ucprelas-npcform__item">
-                    <input type="number" name="addsort" placeholder="Darstellungsreihenfolge">
-                  </div>
-                  <div class="ucprelas-npcform__item">
-                    {$cats_npc}
-                  </div>
+		<div class="ucprelas-addcats__item ucprelas-addmaincats">
+			<h3 class="rela-heading3">Hauptkategorie erstellen</h3>
+			<form action="usercp.php?action=relations" id="newcat" method="post" >
+				<label for="addMain">Bezeichnung Hauptkategorie</label>
+				<input type="text" id="addMain" name="addMain" placeholder="Neue Hauptkategorie" required>
+				<label for="addMainSort">Darstellungsreihenfolge</label>
+				<input type="number" id="addMainSort" name="addMainSort" placeholder="Darstellungsreihenfolge">
+				<input form="newcat" name="newcat" type="submit" value="Speichern" />
+			</form>
+		</div>
 
-                  <div class="ucprelas-npcform__item">
-                    <input type="submit" name="addachar_ucp" value="speichern" id="addachar_ucp" />
-                  </div>
-                </form>
+		<div class="ucprelas-addcats__item ucprelas-addsubcats">
+			<h3 class="rela-heading3">Unterkategorie erstellen</h3>
+			<form  action="usercp.php?action=relations" id="newsubcat" method="post" >
+				<label for="addSub">Bezeichnung Unterkategorie</label>
+				<input type="text" name="addSub" id="addSub" placeholder="Neue Unterkategorie" required>
+				<label for="addSubSort">Darstellungsreihenfolge</label>
+				<input type="number" id="addSubSort" name="addSubSort" placeholder="Darstellungsreihenfolge">
+				<label for="maincat">Hauptkategorie</label>
+				{$hauptkategorie}
+				<input form="newsubcat" name="newsubcat" type="submit" value="Speichern" />
+			</form>
+		</div>
+	</div>
 
-              </div>
-            </div>',
+	<div class="ucprelas-manage__item ucprelas-manageoptions">
+		<h3 class="rela-heading3">Einstellungen Alert</h3>
+		<form  action="usercp.php?action=relations" id="relconfirm_save" method="post" >
+			<p>Möchtest du Relations erst bestätigen, bevor sie bei anderen eingetragen werden?</p>
+			<input name="relaconfirm" value="0" type="radio" {$relaconfirm_yes} id="relaconfirmyes">
+			<label for="relaconfirmyes">Ja</label>
+			<input name="relaconfirm" value="1" type="radio" {$relaconfirm_no} id="relaconfirmno">
+			<label for="relaconfirmyes">Nein</label>
+			<input form="relconfirm_save" name="relconfirm_save" type="submit" value="Speichern" />
+		</form>
+	</div>
+
+	<div class="ucprelas-manage__item ucprelas-addcharas" >
+		<div class="ucprelas-npcform">
+			<form action="usercp.php?action=relations" method="post" >
+				<h3 class="rela-heading3">NPC hinzufügen</h3>
+				<div class="ucprelas-npcform__item">
+					<label for="npcname">Name NPC</label>
+					<input type="text" name="npcname" placeholder="NPC Name" id="npcname" value="" required>
+				</div>
+				<div class="ucprelas-npcform__item">
+					<label for="npcbirthyear">Geburtsjahr NPC</label>
+					<input type="number" name="npcbirthyear" placeholder="NPC Geburtsjahr" id="npcbirthyear" value="">
+				</div>
+				<div class="ucprelas-npcform__item">
+					<label for="npcdeathyear">Todesjahr NPC</label>
+					<span class="smalltext">Wenn der NPC verstorben ist, gib hier das Todesjahr ein. Sonst einfach 0</span>
+					<input type="number" name="npcdeathyear" placeholder="NPC Todesjahr" id="npcdeathyear" value="">
+				</div>
+				{$img}
+				<div class="ucprelas-npcform__item">
+					<label for="npcdescr">Beschreibung</label>
+					<textarea name="npcdescr" placeholder="Kommentar zur Beziehung" id="npcdescr"></textarea>
+				</div>
+				<div class="ucprelas-npcform__item">
+					<label for="addNpcSort">Darstellungsreihenfolge</label>
+					<input type="number" id="addNpcSort" name="addNpcSort" placeholder="Darstellungsreihenfolge">
+				</div>
+				<div class="ucprelas-npcform__item">
+					{$cats_npc}
+				</div>
+				<div class="ucprelas-npcform__item">
+					<label>Darf übernommen werden?</label>
+					<br>
+					<div style="text-align:center">
+						<input type="radio" name="rela_searched" checked="" id="e_rela_searched_yes" value="1">
+						<label for="e_rela_searched_yes"> Ja</label>
+						<input type="radio" name="rela_searched" id="e_rela_searched_no" value="0">
+						<label for="e_rela_searched_no"> Nein</label>
+					</div>
+				</div>
+				<div class="ucprelas-npcform__item">
+					<input type="url" name="searchurl" placeholder="URL zum Gesuch">
+				</div>
+				<div class="ucprelas-npcform__item">
+					<input type="submit" name="addnpc" value="speichern" id="addnpc" />
+				</div>
+			</form>
+			<form action="usercp.php?action=relations" method="post" id="addachar" >
+				<h3 class="rela-heading3">add another Character</h3>
+				<div class="ucprelas-npcform__item">
+					<input type="text" name="addname" placeholder="Charakter" id="username" value="" required>
+				</div>
+
+				<div class="ucprelas-npcform__item">			
+					<textarea name="addescr" placeholder="Kommentar zur Beziehung" id="npcdescr"></textarea>
+				</div>
+				<div class="ucprelas-npcform__item">
+					<input type="number" name="addsort" placeholder="Darstellungsreihenfolge">
+				</div>
+				<div class="ucprelas-npcform__item">
+					{$cats_npc}
+				</div>
+
+				<div class="ucprelas-npcform__item">
+					<input type="submit" name="addachar_ucp" value="speichern" id="addachar_ucp" />
+				</div>
+			</form>
+
+		</div>
+	</div>
+</div>',
     "sid" => "-2",
     "version" => "1.0",
     "dateline" => TIME_NOW
