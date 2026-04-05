@@ -1641,7 +1641,7 @@ function relations_usercp_menu()
 {
   global $usercpmenu, $lang;
   $lang->load("relations");
-  // $usercpmenu .= "<tr><td class=\"trow1 smalltext\"><a href=\"./usercp.php?action=relations\" class=\"usercp_nav_item usercp_nav_mecool\">{$lang->relations_ucpnav}</a></td></tr>";
+  $usercpmenu .= "<tr><td class=\"trow1 smalltext\"><a href=\"./usercp.php?action=relations\" class=\"usercp_nav_item usercp_nav_mecool\">{$lang->relations_ucpnav}</a></td></tr>";
 }
 
 /*
