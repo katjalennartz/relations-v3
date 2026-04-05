@@ -650,7 +650,7 @@ function relations_addtemplates($type = 'install')
 
               </div>
             </div>
-              <div class="ucprelas-manage__item ucprelas-managecats">
+              <div class="ucprelas-manage__item ucprelas-manageoptions">
               <h3 class="rela-heading3">Einstellungen Alert</h3>
               <form  action="usercp.php?action=relations" id="relconfirm_save" method="post" >
                 <p>Möchtest du Relations erst bestätigen, bevor sie bei anderen eingetragen werden?</p>
