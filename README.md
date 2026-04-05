@@ -24,6 +24,8 @@ User können Beziehungen im UCP verwalten. Diese werden im Profil angezeigt.
 * Eigene Übersichts- und Anzeigeoptionen
 * Optional: HTML / MyCode Unterstützung
 * Wird ein Charakter gelöscht, werden eingetragene Beziehgungen auf NPCs umgetragen
+* NPCs können als gesucht markiert werden - User und Gäste können direkt eine PN bei Interesse schicken. (inkl. spamschutz bei Gästen)
+* Gesuchte Charas können im Profil extra aufgelistet werden
 
 ---
 
