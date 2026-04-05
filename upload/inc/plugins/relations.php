@@ -1102,6 +1102,13 @@ function relations_settings_array()
       'value' => '0', // Default
       'disporder' => 14
     ),
+    'relas_jobliste' => array(
+      'title' => "Jobliste",
+      'description' => "Ihr verwendet die jobliste von risuena (https://github.com/katjalennartz/jobliste) dann könnt ihr den Job von Charakteren in den Relations automatisch mit ausgeben lassen. Einmal hier auf ja stellen.",
+      'optionscode' => "yesno",
+      'value' => '0', // Default
+      'disporder' => 15
+    )
   );
   return $setting_array;
 }
@@ -1479,7 +1486,9 @@ function relations_profile()
           $friend = get_user($entry['r_to']);
           if ($friend['uid'] == "") $friend['uid'] = -1;
           $userjob = "";
-          $userjob = relations_getjob($friend['uid']);
+          if ($mybb->settings['relas_jobliste']) {
+            $userjob = relations_getjob($friend['uid']);
+          }
           // dürfen gäste avatare sehen
           if ($thisuser == 0 && $opt_img_guest == 0) {
             $rela_avatar = "<div class=\"entry__item ava avarund\"><i class=\"fa-solid fa-circle-user\"></i></div>";
@@ -1757,15 +1766,22 @@ function relations_usercp()
   //Verarbeitung der Formulardaten 
   //Standardkategorien erstelle
   if (isset($mybb->input['standardcat'])) {
-    $standards = $mybb->settings['standardcat'];
-    $standard = array(
-      "family" => "mom,dad,children,siblings,other",
-      "friends" => "best friends,good friends,friends",
-      "known" => "like,neutral,dislike",
-      "love" => "relationship,well looking,kissed,flirt,one night stand,affair",
-      "hate" => "dislike,hate",
-      "other" => "past loves,past friendships,past affairs"
-    );
+    // $standards = $mybb->settings['standardcat'];
+
+
+    $standard = relations_get_categories();
+
+    //fallback, falls in den Einstellungen keine Kategorien hinterlegt wurden
+    if (empty($standard)) {
+      $standard = array(
+        "family" => "TEST mom,dad,children,siblings,other",
+        "friends" => "best friends,good friends,friends",
+        "known" => "like,neutral,dislike",
+        "love" => "relationship,well looking,kissed,flirt,one night stand,affair",
+        "hate" => "dislike,hate",
+        "other" => "past loves,past friendships,past affairs"
+      );
+    }
 
     $cnt = 0;
     foreach ($standard as $cat => $subcats) {
@@ -2452,6 +2468,39 @@ function relations_profile_wantednpcs()
   }
 }
 
+function relations_get_categories()
+{
+  global $db;
+  $categories = [];
+  // Kategorien holen
+  $cat_query = $db->query("
+        SELECT * FROM " . TABLE_PREFIX . "relas_categories_default
+        ORDER BY cd_sort ASC
+    ");
+
+  while ($cat = $db->fetch_array($cat_query)) {
+
+    $cat_name = $cat['cd_name'];
+
+    $subs = [];
+
+    $sub_query = $db->query("
+            SELECT * FROM " . TABLE_PREFIX . "relas_subcategories_default
+            WHERE scd_cdid = " . (int)$cat['cd_id'] . "
+            ORDER BY scd_sort ASC
+        ");
+
+    while ($sub = $db->fetch_array($sub_query)) {
+      $subs[] = $sub['scd_name'];
+    }
+
+    // 👉 Array → String umwandeln
+    $categories[$cat_name] = implode(",", $subs);
+  }
+
+  return $categories;
+}
+
 function relations_getuserucp($query, $all, $allsubs)
 {
   global $db, $templates, $mybb, $relas_ucp_alluser, $cats, $birthyear, $editname, $editname_sail;
@@ -3064,7 +3113,7 @@ function relations_admin_load()
         }
         while ($subcat = $db->fetch_array($get_subcats)) {
           $form_container->output_cell('<i style="padding-left: 20px;">' . htmlspecialchars_uni($subcat['scd_name']) . '</i>');
-          
+
           $popup_sub = new PopupMenu("relations_sub_edit{$subcat['scd_id']}", $lang->relations_acp_manage_sub);
           $popup_sub->add_item(
             "{$subcat['scd_name']} bearbeiten",
