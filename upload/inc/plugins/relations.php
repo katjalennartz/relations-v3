@@ -76,6 +76,12 @@ function relations_install()
     admin_redirect('index.php?module=config-plugins');
   }
 
+  // Risuenas Updates Files müssen vorhanden sein
+  if (!file_exists(MYBB_ADMIN_DIR . "/modules/rpgstuff/module_meta.php")) {
+    flash_message("Du hast den Ordner mit den Dateien für automatische Updates nicht hochgeladen. (siehe inc/plugins/risuenas_updates)", 'error');
+    admin_redirect('index.php?module=config-plugins');
+  }
+
   //falls vorher nicht sauber deinstalliert
   relations_uninstall();
 
@@ -89,7 +95,7 @@ function relations_install()
   require_once MYBB_ADMIN_DIR . "inc/functions_themes.php";
 
   $sid = $db->insert_query("themestylesheets", $css);
-  $db->update_query("themestylesheets", array("cachefile" => "css.php?stylesheet=" . $sid), "sid = '" . $sid . "'", 1);
+  $db->update_query("themestylesheets", array("cachefile" => "relations.css"), "sid = '" . $sid . "'", 1);
 
   $tids = $db->simple_select("themes", "tid");
   while ($theme = $db->fetch_array($tids)) {
@@ -316,6 +322,19 @@ function relations_addtemplates($type = 'install')
     "version" => "1.0",
     "dateline" => TIME_NOW
   );
+  $templates[] = array(
+    "title" => 'relas_memprofile_searchbit',
+    "template" => '<div class="relas_searchbit bl-box--soft bl-space--inner">
+	<div class="relas_searchbit__title bl-heading3">{$link}</div>
+	<div class="relas_searchbit__descr">{$relation}</div>
+	<div class="bl-relas_searchbit__text">{$descr}</div>	
+	{$relas_memberprofil_npcsearch}
+</div>
+        ',
+    "sid" => "-2",
+    "version" => "1.0",
+    "dateline" => TIME_NOW
+  );
 
   $templates[] = array(
     "title" => 'relas_memberprofil_subcat',
@@ -332,132 +351,132 @@ function relations_addtemplates($type = 'install')
   $templates[] = array(
     "title" => 'relas_ucp',
     "template" => '<html>
-	<head>
+                <head>
 		<title>{$lang->user_cp} Relationverwaltung</title>
-		{$headerinclude}
-	</head>
-	<body>
-		{$header}
+                  {$headerinclude}
+                </head>
+                <body>
+                  {$header}
 		<table width="100%" border="0" align="center">
-			<tr>
+                    <tr>
 				{$usercpnav}
-				<td valign="top">
+                      <td valign="top">
 					<table border="0" cellspacing="{$theme[\\\'borderwidth\\\']}" cellpadding="{$theme[\\\'tablespace\\\']}" class="tborder">
 						<tr>
 							<td class="thead"><strong>Relations</strong></td>
 						</tr>
 						<tr>
 							<td class="trow2">
-								<div class="ucprelas-con">
-									<div class="ucprelas-con__item">
-										<p>Hier kannst du deine Relations verwalten. Die Einstellungen für die Alerts
-											kannst du <a href="alerts.php?action=settings">hier</a> vornehmen. Hier kannst du Anfragen annehmen, oder ablehnen und NPCs eintragen. Anfragen stellen kannst du auf dem jeweiligen Profils oder hier.
-										</p>
+                        <div class="ucprelas-con">
+                          <div class="ucprelas-con__item">
+                            <p>Hier kannst du deine Relations verwalten. Die Einstellungen für die Alerts
+                              kannst du <a href="alerts.php?action=settings">hier</a> vornehmen. Hier kannst du Anfragen annehmen, oder ablehnen und NPCs eintragen. Anfragen stellen kannst du auf dem jeweiligen Profils oder hier.
+                            </p>
 											{$relas_ucp_manage}
-										</div>
-									</div><!-- edn ucprelas-con__item ucprelas-request-->
+                            </div>
+                          </div><!-- edn ucprelas-con__item ucprelas-request-->
 
-									<div class="ucprelas-con__item ucprelas-request">
-										<div class="ucprelas-request__item ucprelas-openrequests">
+                          <div class="ucprelas-con__item ucprelas-request">
+                            <div class="ucprelas-request__item ucprelas-openrequests">
 											<h2 class="rela-heading2">open requests</h2>
-											{$relas_ucp_toaccept}
-											{$relas_ucp_waiting}
-											{$relas_ucp_notadded}
-											{$relas_ucp_denied}
-										</div>
+                                {$relas_ucp_toaccept}
+                                {$relas_ucp_waiting}
+                              {$relas_ucp_notadded}
+                              {$relas_ucp_denied}
+                            </div>
 
-										<div class="ucprelas-con__item ucprelas-request">
-											<div class="ucprelas-request__item ucprelas-all">
+                            <div class="ucprelas-con__item ucprelas-request">
+                              <div class="ucprelas-request__item ucprelas-all">
 												<h2 class="rela-heading2">Deine Relations</h2>
-												<div class="ucprelas-all__item ucprelas-alltabs">
-													{$relas_ucp_tablinks}
-													<div class="ucprelas-alltabs__item ">
-														{$relas_ucp_cats}
-														{$relas_ucp_all}
-													</div>
+                                <div class="ucprelas-all__item ucprelas-alltabs">
+                                  {$relas_ucp_tablinks}
+                                  <div class="ucprelas-alltabs__item ">
+                                    {$relas_ucp_cats}
+                                    {$relas_ucp_all}
+                                  </div>
 
 
-												</div>
-											</div>
-										</div>
-									</div><!--ucprelas-con-->
-									</td>
-						</tr>
-					</table>
+                                </div>
+                              </div>
+                            </div>
+                          </div><!--ucprelas-con-->
+                        </td>
+                    </tr>
+                  </table>
 				</td>
 			</tr>
 		</table>
-		<script>
-			function openRestype(evt, relatype) {
-				// Declare all variables
-				var i, rela_tabcontent, relas_tablinks;
+                      <script>
+                    function openRestype(evt, relatype) {
+                      // Declare all variables
+                      var i, rela_tabcontent, relas_tablinks;
 
-				// Get all elements with class="tabcontent" and hide them
-				rela_tabcontent = document.getElementsByClassName("rela_tabcontent");
-				for (i = 0; i < rela_tabcontent.length; i++) {
-					rela_tabcontent[i].style.display = "none";
-				}
+                      // Get all elements with class="tabcontent" and hide them
+                      rela_tabcontent = document.getElementsByClassName("rela_tabcontent");
+                      for (i = 0; i < rela_tabcontent.length; i++) {
+                        rela_tabcontent[i].style.display = "none";
+                      }
 
-				// Get all elements with class="tablinks" and remove the class "active"
-				relas_tablinks = document.getElementsByClassName("relas_tablinks");
-				for (i = 0; i < relas_tablinks.length; i++) {
-					relas_tablinks[i].className = relas_tablinks[i].className.replace(" active", "");
-				}
+                      // Get all elements with class="tablinks" and remove the class "active"
+                      relas_tablinks = document.getElementsByClassName("relas_tablinks");
+                      for (i = 0; i < relas_tablinks.length; i++) {
+                        relas_tablinks[i].className = relas_tablinks[i].className.replace(" active", "");
+                      }
 
-				// Show the current tab, and add an "active" class to the button that opened the tab
-				document.getElementById(relatype).style.display = "block";
-				evt.currentTarget.className += " active";
-			}
+                      // Show the current tab, and add an "active" class to the button that opened the tab
+                      document.getElementById(relatype).style.display = "block";
+                      evt.currentTarget.className += " active";
+                    }
 
-		</script>
-		<script>
-			// Get the element with id="defaultOpen" and click on it
-			document.getElementById("but_tabdefault").click();
-		</script>
+                  </script>
+                  <script>
+                    // Get the element with id="defaultOpen" and click on it
+                    document.getElementById("but_tabdefault").click();
+                  </script>
 
 		<link rel="stylesheet" href="{$mybb->settings[\\\'bburl\\\']}/jscripts/select2/select2.css">
 		<script type="text/javascript" src="{$mybb->settings[\\\'bburl\\\']}/jscripts/select2/select2.min.js?ver=1804"></script>
-		<script type="text/javascript">
-			<!--
-				$("#username").select2({
-				placeholder: "username",
-				minimumInputLength: 2,
-				multiple: false,
+                  <script type="text/javascript">
+                    <!--
+                      $("#username").select2({
+                      placeholder: "username",
+                      minimumInputLength: 2,
+                      multiple: false,
 				ajax: { // instead of writing the function to execute the request we use Select2s convenient helper
 					url: "{$mybb->settings[\\\'bburl\\\']}/xmlhttp.php?action=get_users",
-					dataType: \\\'json\\\',
-					data: function (term, page) {
-						return {
-							query: term, // search term
-						};
-					},
-					results: function (data, page) { // parse the results into the format expected by Select2.
-						// since we are using custom formatting functions we do not need to alter remote JSON data
-						return {results: data};
-					}
-				},
-				initSelection: function(element, callback) {
-					var query = $(element).val();
-					if (query !== "") {
+                        dataType: \\\'json\\\',
+                        data: function (term, page) {
+                          return {
+                            query: term, // search term
+                          };
+                        },
+                        results: function (data, page) { // parse the results into the format expected by Select2.
+                          // since we are using custom formatting functions we do not need to alter remote JSON data
+                          return {results: data};
+                        }
+                      },
+                      initSelection: function(element, callback) {
+                        var query = $(element).val();
+                        if (query !== "") {
 						$.ajax("{$mybb->settings[\\\'bburl\\\']}/xmlhttp.php?action=get_users&getone=1", {
-							data: {
-								query: query
-							},
-							dataType: "json"
-						}).done(function(data) { callback(data); });
-					}
-				},
-			});
+                            data: {
+                              query: query
+                            },
+                            dataType: "json"
+                          }).done(function(data) { callback(data); });
+                        }
+                      },
+                    });
 
-			$(\\\'[for=username]\\\').on(\\\'click\\\', function(){
-				$("#username").select2(\\\'open\\\');
-				return false;
-			});
-			// -->
-		</script>
-		{$footer}
-	</body>
-</html>
+                    $(\\\'[for=username]\\\').on(\\\'click\\\', function(){
+                      $("#username").select2(\\\'open\\\');
+                      return false;
+                    });
+                    // -->
+                  </script>
+                  {$footer}
+                </body>
+              </html>
         ',
     "sid" => "-2",
     "version" => "1.0",
@@ -517,6 +536,39 @@ function relations_addtemplates($type = 'install')
     "version" => "1.0",
     "dateline" => TIME_NOW
   );
+  $templates[] = array(
+    "title" => 'relas_ucp_editnpc',
+    "template" => '<div class ="model-form modal__formitem">
+        <label for="e_rela_npcname{$rid}">NPC Name</label>
+        <input id="e_rela_npcname{$rid}" type="text" value="{$username}" name="e_rela_npcname" required>
+      </div>
+      <div class ="model-form modal__formitem">
+        <label>Darf übernommen werden?</label>
+        <span style="justify-self:start;">
+          <input type="radio" name="e_rela_searched" {$searchchecked_y} id="e_rela_searched_yes" value="1">
+          <span> Ja</span>
+          <input type="radio" name="e_rela_searched" {$searchchecked_n} id="e_rela_searched_no" value="0">
+          <span> Nein</span>
+        </span>
+      </div>
+      <div class ="model-form modal__formitem">
+        <label for="e_rela_searchurl{$rid}">URL zu Gesuch</label>
+        <input type="url" id="e_rela_searchurl{$rid}" value="{$relauser[\\\'r_searchurl\\\']}" name="searchurl">
+      </div>
+      <div class ="model-form modal__formitem">
+        <label for="e_rela_npcbirthyear{$rid}">NPC Geburtsjahr</label>
+        <input type="number" id="e_rela_npcbirthyear{$rid}" value="{$relauser[\\\'r_npcbirthyear\\\']}" name="e_rela_npcbirthyear">
+      </div>
+      <div class ="model-form modal__formitem">
+      <label for="e_rela_npcdeathyear{$rid}">NPC Todesjahr</label>
+      <span class="smalltext">Wenn der NPC verstorben ist, gib hier das Todesjahr ein. Sonst einfach 0</span>
+      <input type="number" id="e_rela_npcdeathyear{$rid}" value="{$relauser[\\\'r_npcdeathyear\\\']}" name="e_rela_npcdeathyear">
+    </div>
+        ',
+    "sid" => "-2",
+    "version" => "1.0",
+    "dateline" => TIME_NOW
+  );
 
   $templates[] = array(
     "title" => 'relas_ucp_denied',
@@ -543,8 +595,9 @@ function relations_addtemplates($type = 'install')
 
 		<div class="modal relamodal editrela" id="editdenied{$denied[\\\'r_id\\\']}" style="display: none; padding: 10px; margin: auto; text-align: center;">
 			<form action="usercp.php?action=relations" id="addform{$denied[\\\'r_id\\\']}" method="post" >
-			<input type="hidden" value="{$denied[\\\'r_id\\\']}" name="e_rela_id" placeholder="Darstellungsreihenfolge">
-			<textarea name="e_rela_kom" placeholder="Kommentar zur Beziehung" id="npcdescr">{$denied[\\\'r_kommentar\\\']}</textarea>
+      <input type="hidden" value="{$denied[\\\'r_to\\\']}" name="e_rela_to">
+      <input type="hidden" value="{$denied[\\\'r_id\\\']}" name="e_rela_id">
+      <textarea name="e_rela_kom" placeholder="Kommentar zur Beziehung" id="npcdescr">{$denied[\\\'r_kommentar\\\']}</textarea>
 			<input type="number" value="{$denied[\\\'r_sort\\\']}" name="e_rela_sort" placeholder="Darstellungsreihenfolge">
 			{$cats}
 			<input form="addform{$denied[\\\'r_id\\\']}" type="submit" name="e_rela" value="Senden" />
@@ -565,7 +618,7 @@ function relations_addtemplates($type = 'install')
             <div class="ucprelas-manage__item ucprelas-managecats">
               <h3 class="rela-heading3">Kategorien verwalten</h3>
               {$relas_ucp_managecat}
-            </div>
+        </div>
             <div class="ucprelas-manage__item ucprelas-addcats">
               <div class="ucprelas-addcats__item ">
                 <h3 class="rela-heading3">Standards erstellen</h3>
@@ -619,6 +672,11 @@ function relations_addtemplates($type = 'install')
                   <div class="ucprelas-npcform__item">
                     <label for="npcbirthyear">Geburtsjahr NPC</label>
                     <input type="number" name="npcbirthyear" placeholder="NPC Geburtsjahr" id="npcbirthyear" value="">
+                  </div>
+                                    <div class="ucprelas-npcform__item">
+                    <label for="npcdeathyear">Todesjahr NPC</label>
+                    <span class="smalltext">Wenn der NPC verstorben ist, gib hier das Todesjahr ein. Sonst einfach 0</span>
+                    <input type="number" name="npcdeathyear" placeholder="NPC Todesjahr" id="npcdeathyear" value="">
                   </div>
                   {$img}
                   <div class="ucprelas-npcform__item">
@@ -680,25 +738,27 @@ function relations_addtemplates($type = 'install')
   $templates[] = array(
     "title" => 'relas_ucp_managecat',
     "template" => '<div class="ucprelas-editcat">
-              <div class="editcname" id="{$cid}"><b>{$c_name} {$editcatmod}</b><a href="usercp.php?action=relations&cat=delete&cid={$cid}" onClick="return confirm(\\\'Möchtest du die Kategorie {$c_name} wirklich löschen?\\\');">[löschen]</a></div>
+              <div class="editcname" id="{$cid}"><b>{$c_name} 
+              <a href="#" onclick="$(\\\'#cedit{$cid}\\\').modal({ fadeDuration: 250, keepelement: true, zIndex: (typeof modal_zindex !== \\\'undefined\\\' ? modal_zindex : 9999) }); return false;" style="cursor: pointer;">[e]</a>
+              </b><a href="usercp.php?action=relations&cat=delete&cid={$cid}" onClick="return confirm(\\\'Möchtest du die Kategorie {$c_name} wirklich löschen?\\\');">[löschen]</a></div>
               <div class="ucprelas-managesubcat">{$relas_ucp_managesubcat}</div>
               <div class="modal relamodal managesubcat" id="cedit{$cid}" style="display: none; padding: 10px; margin: auto; text-align: center;">
-                <form action="usercp.php?action=relations" id="editcat" method="post" >
-                  <div class="model-form">
+            <form action="usercp.php?action=relations" id="editcat" method="post" >
+                <div class="model-form">
                     <label for="c_name_e{$cid}">Name</label>
                     <input type="text" value="{$c_name}" id="c_name_e{$cid}" name="c_name_e">
-                    <input type="hidden" value="{$cid}" name="c_cid_e">
-                  </div>
-                  <div class="model-form">
+                <input type="hidden" value="{$cid}" name="c_cid_e">
+                </div>
+                <div class="model-form">
                     <label for="c_sort_e{$cid}">Reihenfolge</label>
                     <input type="number" value="{$cat[\\\'c_sort\\\']}" id="c_sort_e{$cid}" name="c_sort_e">
-                  </div>
-                  <div class="model-form model-form--button">		
+                </div>
+                <div class="model-form model-form--button">		
                     <input type="submit" name="editcat" value="Speichern" />            
-                  </div>
-                </form>
+                </div>
+            </form>
               </div>
-            </div>',
+        </div>',
     "sid" => "-2",
     "version" => "1.0",
     "dateline" => TIME_NOW
@@ -706,28 +766,31 @@ function relations_addtemplates($type = 'install')
 
   $templates[] = array(
     "title" => 'relas_ucp_managesubcat',
-    "template" => '<span class="editscname bl-btn" id={$subcat[\\\'sc_id\\\']}>{$sc_name} {$editscatmod} <a href="usercp.php?action=relations&scat=delete&scid={$scid}" onClick="return confirm(\\\'Möchtest du die Unterkategorie {$sc_name} wirklich löschen?\\\');">[löschen]</a></span>
+    "template" => '<span class="editscname bl-btn" id={$subcat[\\\'sc_id\\\']}>{$sc_name}
+    
+    <a href="#" onclick="$(\\\'#scedit{$scid}\\\').modal({ fadeDuration: 250, keepelement: true, zIndex: (typeof modal_zindex !== \\\'undefined\\\' ? modal_zindex : 9999) }); return false;" style="cursor: pointer;">[e]</a>
+    <a href="usercp.php?action=relations&scat=delete&scid={$scid}" onClick="return confirm(\\\'Möchtest du die Unterkategorie {$sc_name} wirklich löschen?\\\');">[löschen]</a></span>
 
           <div class="modal  relamodal editscname" id="scedit{$scid}" style="display: none; padding: 10px; margin: auto; text-align: center;">
-            <form action="usercp.php?action=relations" id="editscat{$scid}" method="post" >
-              <div class ="model-form">
+          <form action="usercp.php?action=relations" id="editscat{$scid}" method="post" >
+            <div class ="model-form">
                 <label for="sc_edit_name{$scid}">Name:</label>
                 <input type="text" value="{$sc_name}"  id="sc_edit_name{$scid}" name="sc_edit_name">
-                <input type="hidden" value="{$scid}" name="sc_edit_id">
-              </div>
-              <div class ="model-form">
+              <input type="hidden" value="{$scid}" name="sc_edit_id">
+            </div>
+            <div class ="model-form">
                 <label for="sc_edit_sort{$scid}">Reihenfolge</label>
                 <input type="number" value="{$sortcatvalue}" id="sc_edit_sort{$scid}" name="sc_edit_sort">
-              </div>
-              <div class ="model-form">
+            </div>
+            <div class ="model-form">
                 <label for="cat{$scid}">Hauptkategorie</label>
-                {$hauptkategoriesub}
-              </div>
-              <div class ="model-form model-form--button">
-                <input form="editscat{$scid}" type="submit" name="editsubcat" value="Speichern" />
-              </div>
-            </form>
-          </div>
+              {$hauptkategoriesub}
+            </div>
+            <div class ="model-form model-form--button">
+              <input form="editscat{$scid}" type="submit" name="editsubcat" value="Speichern" />
+            </div>
+          </form>
+        </div>
         ',
     "sid" => "-2",
     "version" => "1.0",
@@ -749,29 +812,29 @@ function relations_addtemplates($type = 'install')
   $templates[] = array(
     "title" => 'relas_ucp_notaddedbit',
     "template" => '<div class="ucprelas_toaccept__item ucprelas__item ucprelas-requestuser">
-              <div class="ucprelas-requestuser__item name">
+            <div class="ucprelas-requestuser__item name">
                 <b>{$username}</b> about you:
-              </div>
-              <div class="ucprelas-requestuser__item avarund" style="background-image:url(\\\'{$user[\\\'avatar\\\']}\\\')">
-              </div>
-              <div class="ucprelas-requestuser__item cats">
-                In <b>{$haupt}:</b><br/><i>{$subkategorie}</i>
-              </div>
-              {$kommentar}
-              <div class="ucprelas-requestuser__item answer">
+            </div>
+            <div class="ucprelas-requestuser__item avarund" style="background-image:url(\\\'{$user[\\\'avatar\\\']}\\\')">
+            </div>
+            <div class="ucprelas-requestuser__item cats">
+              In <b>{$haupt}:</b><br/><i>{$subkategorie}</i>
+            </div>
+            {$kommentar}
+            <div class="ucprelas-requestuser__item answer">
                 <a onclick="$(\\\'#add{$notadd[\\\'r_id\\\']}\\\').modal({ fadeDuration: 250, keepelement: true, zIndex: (typeof modal_zindex !== \\\'undefined\\\' ? modal_zindex : 9999) }); return false;" style="cursor: pointer;">[hinzufügen]</a>
 
                 <div class="modal relamodal addrela" id="add{$notadd[\\\'r_id\\\']}" style="display: none; padding: 10px; margin: auto; text-align: center;">
-                  <form action="usercp.php?action=relations" id="addform{$notadd[\\\'r_id\\\']}" method="post" >
-                    <input type="hidden" name="r_from" id="r_from" value="{$notadd[\\\'r_from\\\']}">
-                    <textarea name="adddescr" placeholder="Kommentar zur Beziehung" id="npcdescr" ></textarea>
-                    <input type="number" name="addSort" placeholder="Darstellungsreihenfolge">
-                    {$cats}
-                    <input form="addform{$notadd[\\\'r_id\\\']}" type="submit" name="addrela" value="Senden" />
-                  </form>
-                </div>
+                <form action="usercp.php?action=relations" id="addform{$notadd[\\\'r_id\\\']}" method="post" >
+                  <input type="hidden" name="r_from" id="r_from" value="{$notadd[\\\'r_from\\\']}">
+                  <textarea name="adddescr" placeholder="Kommentar zur Beziehung" id="npcdescr" ></textarea>
+                  <input type="number" name="addSort" placeholder="Darstellungsreihenfolge">
+                  {$cats}
+                  <input form="addform{$notadd[\\\'r_id\\\']}" type="submit" name="addrela" value="Senden" />
+                </form>
               </div>
             </div>
+          </div>
         ',
     "sid" => "-2",
     "version" => "1.0",
@@ -801,10 +864,10 @@ function relations_addtemplates($type = 'install')
   $templates[] = array(
     "title" => 'relas_ucp_toaccept',
     "template" => '<div class="ucprelas-openrequests__item ucprelas_toaccept ">
-        <h3 class="rlea-heading3">Zu Bestätigen</h3>
+        <h3 class="rela-heading3">Zu Bestätigen</h3>
         {$relas_ucp_toaccept_bit}
-      </div>
-    ',
+        </div>
+        ',
     "sid" => "-2",
     "version" => "1.0",
     "dateline" => TIME_NOW
@@ -815,16 +878,16 @@ function relations_addtemplates($type = 'install')
     "template" => '<div class="ucprelas-toaccept__item ucprelas__item ucprelas-toaccept__user ">
             <div class="ucprelas-toaccept__user name">
               <b>von:</b> {$username}
-            </div>
+    </div>
             <div class="ucprelas-toaccept__user accept__item avarund" style="background-image:url(\\\'{$user[\\\'avatar\\\']}\\\')">
-            </div>
+    </div>
             <div class="ucprelas-toaccept__user cats"><b>{$haupt}</b> » {$subkategorie}</div>
-            {$kommentar}
+{$kommentar}
             <div class="ucprelas-toaccept__user answer">
               <a href="usercp.php?action=relations&accept=1&rid={$entry[\\\'r_id\\\']}" onClick="return confirm(\\\'Möchtest du die Anfrage von {$user[\\\'username\\\']} annehmen?\\\');">[bestätigen]</a>
               <a href="usercp.php?action=relations&deny=1&rid={$entry[\\\'r_id\\\']}" onClick="return confirm(\\\'Möchtest du die Anfrage von {$user[\\\'username\\\']} ablehnen?\\\');">[ablehnen]</a> 
               <a onclick="$(\\\'#add{$entry[\\\'r_id\\\']}\\\').modal({ fadeDuration: 250, keepelement: true, zIndex: (typeof modal_zindex !== \\\'undefined\\\' ? modal_zindex : 9999) }); return false;" style="cursor: pointer;">[anfragen]</a>
-
+            
               <div class="modal relamodal addrela" id="add{$entry[\\\'r_id\\\']}" style="display: none; padding: 10px; margin: auto; text-align: center;">
                 <form action="usercp.php?action=relations" id="addform{$entry[\\\'r_id\\\']}" method="post" >
                   <input type="hidden" name="r_from" id="r_from" value="{$entry[\\\'r_from\\\']}">
@@ -832,12 +895,12 @@ function relations_addtemplates($type = 'install')
                   <textarea name="adddescr" placeholder="Kommentar zur Beziehung" id="addSort{$entry[\\\'r_id\\\']}"></textarea>
                   <label for="addSort{$entry[\\\'r_id\\\']}">Darstellungsreihenfolge</label>
                   <input id="addSort{$entry[\\\'r_id\\\']}" type="number" name="addSort" placeholder="Darstellungsreihenfolge">
-                  {$cats}
+            {$cats}
                   <input form="addform{$entry[\\\'r_id\\\']}" type="submit" name="addrela" value="Senden" />
-                </form>
-              </div>
+                    </form>
+                </div>
             </div>
-          </div>
+        </div>
         ',
     "sid" => "-2",
     "version" => "1.0",
@@ -847,11 +910,23 @@ function relations_addtemplates($type = 'install')
   $templates[] = array(
     "title" => 'relas_ucp_waiting',
     "template" => '<div class="ucprelas-openrequests__item ucprelas_waiting  ">
-            <h3 class="rlea-heading3">Wartet auf Bestätigung</h3>
+            <h3 class="rela-heading3">Wartet auf Bestätigung</h3>
             <div class="ucprelas-openrequests__item ucprelas_waiting">
               {$relas_ucp_waiting_bit}
-            </div>
+              </div>
           </div>
+        ',
+    "sid" => "-2",
+    "version" => "1.0",
+    "dateline" => TIME_NOW
+  );
+
+  $templates[] = array(
+    "title" => 'relas_ucp_npc_editimg',
+    "template" => '<div class ="model-form modal__formitem">
+      <label for="e_rela_npcimg{$rid}">NPC Img</label>
+      <input id="e_rela_npcimg{$rid}" type="text" value="{$userimg}" name="e_rela_npcimg">
+      </div>
         ',
     "sid" => "-2",
     "version" => "1.0",
@@ -880,9 +955,9 @@ function relations_addtemplates($type = 'install')
                     {$cats}
                     <input form="addform{$entry[\\\'r_id\\\']}" type="submit" name="e_rela" value="Senden" />
                   </form>
-                </div>
+                            </div>
               </div>
-            </div>
+                            </div>
         ',
     "sid" => "-2",
     "version" => "1.0",
@@ -915,24 +990,11 @@ function relations_addtemplates($type = 'install')
   }
 }
 
-function relations_add_settings($type = 'install')
+function relations_settings_array()
 {
-  global $db, $mybb, $lang;
+  global $lang;
   $lang->load("relations");
-  if ($type == 'install') {
-    // Einstellungen
-    $setting_group = array(
-      'name' => 'relations',
-      'title' => $lang->relations_title,
-      'description' => $lang->relations_settings_descr,
-      'disporder' => 7, // The order your setting group will display
-      'isdefault' => 0
-    );
-    $gid = $db->insert_query("settinggroups", $setting_group);
-  } else {
-    $gid = $db->fetch_field($db->write_query("SELECT gid FROM `" . TABLE_PREFIX . "settinggroups` WHERE name like 'relas%' LIMIT 1;"), "gid");
-  }
-
+  $setting_array = array();
   $setting_array = array(
     'relas_alert_confirm' => array(
       'title' => $lang->relations_settings_alertConfirmTitle,
@@ -1011,8 +1073,58 @@ function relations_add_settings($type = 'install')
       'optionscode' => 'groupselectsingle',
       'value' => '2', // Default
       'disporder' => 11
-    )
+    ),
+    'relas_ingamezeitraum' => array(
+      'title' => "Von welchem Ingamemonat und Jahr ausgehend soll das Alter berechnet werden? z.B. 2026-01 für Januar 2026",
+      'description' => $lang->relations_settings_group_scenetracker,
+      'optionscode' => 'text',
+      'value' => '2026-01', // Default
+      'disporder' => 12
+    ),
+    'relas_birthday' => array(
+      'title' => "Wie wird der Gebursjahr des Charakters angegeben?",
+      'description' => $lang->relations_settings_group_scenetracker,
+      'optionscode' => "radio\nmybb=Mybb Geburtstagsfeld\nfid=Mybb Profilfeld\nrisu=Risuenas Steckbriefplugin",
+      'value' => 'fid', // Default
+      'disporder' => 13
+    ),
+    'relas_fid' => array(
+      'title' => "Profilfeld ID",
+      'description' => "Die Id des Profilfelds mit dem Geburtstag? Der Geburtstag muss in dem Feld als dd.mm.YYYY gespeichert werden.",
+      'optionscode' => "numeric",
+      'value' => '0', // Default
+      'disporder' => 14
+    ),
+    'relas_risu' => array(
+      'title' => "Bezeichner des Steckbriefsfeld",
+      'description' => "Der eindeutige Bezeichner des Felds, wo der Geburtstag gespeichert wird. Muss als Typ date haben.",
+      'optionscode' => "text",
+      'value' => '0', // Default
+      'disporder' => 14
+    ),
   );
+  return $setting_array;
+}
+
+function relations_add_settings($type = 'install')
+{
+  global $db, $mybb, $lang;
+  $lang->load("relations");
+  if ($type == 'install') {
+    // Einstellungen
+    $setting_group = array(
+      'name' => 'relations',
+      'title' => $lang->relations_title,
+      'description' => $lang->relations_settings_descr,
+      'disporder' => 7, // The order your setting group will display
+      'isdefault' => 0
+    );
+    $gid = $db->insert_query("settinggroups", $setting_group);
+  } else {
+    $gid = $db->fetch_field($db->write_query("SELECT gid FROM `" . TABLE_PREFIX . "settinggroups` WHERE name like 'rela%' LIMIT 1;"), "gid");
+  }
+
+  $setting_array = relations_settings_array();
 
   if ($type == 'install') {
     foreach ($setting_array as $name => $setting) {
@@ -1023,43 +1135,36 @@ function relations_add_settings($type = 'install')
   }
 
   if ($type == 'update') {
-    foreach ($setting_array as $name => $setting) {
-      $setting['name'] = $name;
-      $setting['gid'] = $gid;
-
-      //alte einstellung aus der db holen
-      $check = $db->write_query("SELECT * FROM `" . TABLE_PREFIX . "settings` WHERE name = '{$name}'");
-      $check2 = $db->write_query("SELECT * FROM `" . TABLE_PREFIX . "settings` WHERE name = '{$name}'");
-      $check = $db->num_rows($check);
-
-      if ($check == 0) {
-        $db->insert_query('settings', $setting);
-        echo "Setting: {$name} wurde hinzugefügt.";
-      } else {
-
-        //die einstellung gibt es schon, wir testen ob etwas verändert wurde
-        while ($setting_old = $db->fetch_array($check2)) {
-          if (
-            $setting_old['title'] != $setting['title'] ||
-            $setting_old['description'] != $setting['description'] ||
-            $setting_old['optionscode'] != $setting['optionscode'] ||
-            $setting_old['disporder'] != $setting['disporder']
-          ) {
-            //wir wollen den value nicht überspeichern, also nur die anderen werte aktualisieren
-            $update_array = array(
-              'title' => $setting['title'],
-              'description' => $setting['description'],
-              'optionscode' => $setting['optionscode'],
-              'disporder' => $setting['disporder']
-            );
-            $db->update_query('settings', $update_array, "name='{$name}'");
-            echo "Setting: {$name} wurde aktualisiert.<br>";
-          }
-        }
-      }
-    }
+    require_once MYBB_ROOT . "inc/plugins/risuena_updates/risuena_updatefile.php";
+    risuenaupdatefile_update_settings($setting_array, "relations");
   }
   rebuild_settings();
+}
+
+//ADMIN CP STUFF
+$plugins->add_hook("admin_config_settings_change", "relations_settings_change");
+// Set peeker in ACP
+function relations_settings_change()
+{
+  global $db, $mybb, $relations_settings_peeker;
+
+  $result = $db->simple_select("settinggroups", "gid", "name='relations'", array("limit" => 1));
+  $group = $db->fetch_array($result);
+  $relations_settings_peeker = ($mybb->input['gid'] == $group['gid']) && ($mybb->request_method != 'post');
+}
+
+$plugins->add_hook("admin_settings_print_peekers", "relations_settings_peek");
+// Add peeker in ACP
+function relations_settings_peek(&$peekers)
+{
+  global $relations_settings_peeker;
+
+  if ($relations_settings_peeker) {
+
+    //Weitere Einstellungen im ACP anzeigen, je nach auswahl
+    $peekers[] = 'new Peeker($(".setting_relas_birthday"), $("#row_setting_relas_fid"),"fid",true)';
+    $peekers[] = 'new Peeker($(".setting_relas_birthday"), $("#row_setting_relas_risu"),"risu",true)';
+  }
 }
 
 /**
@@ -1074,9 +1179,83 @@ function relations_css($themeid = 1)
     'name' => 'relations.css',
     'tid' => 1,
     'attachedto' => '',
-    "stylesheet" =>    '
-                /* empty :( */
-      
+    "stylesheet" => '
+        /*User CP */
+        .ucprelas-manage {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: space-around;
+        }
+
+        .relamodal form {
+          display: flex;
+          flex-direction: column;
+        }
+        .ucprelas-con label {
+            font-weight: bold;
+        }
+
+        .ucprelas-manage__item {
+            width: 30%;
+            overflow: auto;
+            max-height: 250px;
+        }
+        .ucprelas-editcat {
+            display: flex;
+            flex-direction: column;
+            margin-bottom: 10px;
+        }
+
+        .ucprelas-managesubcat {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ucprelas-npcform__item {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ucprelas-addcats__item form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .ucprelas-toaccept__item {
+            border-radius: 7px;
+            width: 25%;
+            background-color: #fff;
+            padding: 8px;
+            border: 1px solid #ccc;
+        }
+
+        .ucprelas-manage__item .ucprelas-addcharas {
+            width: 100%;
+        }
+
+        .ucprelas-manage__item .ucprelas-npcform {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-around;
+        }
+
+        .ucprelas-manage__item.ucprelas-addcharas {
+            width: 100%;
+        }
+
+        .ucprelas-manage__item .ucprelas-npcform form {
+            flex: 0 1 30%;
+            padding: 20px;
+        }
+
+        .ucprelas__item.ucprelas-user {
+            border-radius: 7px;
+            width: 25%;
+            background-color: #fff;
+            padding: 8px;
+            border: 1px solid #ccc;
+        }
         ',
     'cachefile' => $db->escape_string(str_replace('/', '', 'relations.css')),
     'lastmodified' => time()
@@ -1088,61 +1267,102 @@ function relations_add_db($type = 'install')
 {
   global $db;
   //table Rela
-  if (!$db->table_exists("relas_entries")) {
-    $db->query("CREATE TABLE `" . TABLE_PREFIX . "relas_entries` (
-            `r_id` int(10) NOT NULL AUTO_INCREMENT,
-            `r_to` int(10) NOT NULL DEFAULT 0,
-            `r_from` int(10) NOT NULL DEFAULT 0,
-            `r_kategorie` varchar(150) NOT NULL DEFAULT '',
-            `r_kommentar` varchar(2555) NOT NULL DEFAULT '',
-            `r_accepted` int(10) NOT NULL DEFAULT 0,
-            `r_npc` int(1) NOT NULL DEFAULT 0,
-            `r_npcname` varchar(150) NOT NULL DEFAULT '',
-            `r_npcimg` varchar(250) NOT NULL DEFAULT '', 
-            `r_npcbirthyear` int(10) NOT NULL DEFAULT '0', 
-            `r_searched` varchar(250) NOT NULL DEFAULT '', 
-            `r_searchurl` varchar(250) NOT NULL DEFAULT '',    
-            `r_sort` int(10) NOT NULL DEFAULT 1,
-            `r_overview` varchar(250) NOT NULL DEFAULT '', 
-            PRIMARY KEY (`r_id`)
-        ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;");
-  }
-  // ALTER TABLE `mybb_relas_entries` ADD `r_npcage` INT NOT NULL DEFAULT '0' AFTER `r_npcname`;
 
-  //table Category
-  if (!$db->table_exists("relas_categories")) {
-    $db->query("CREATE TABLE `" . TABLE_PREFIX . "relas_categories` (
-            `c_id` int(10) NOT NULL AUTO_INCREMENT,
-            `c_name` varchar(100) NOT NULL DEFAULT '',
-            `c_sort` int(10) NOT NULL DEFAULT 1,
-            `c_uid` int(10) NOT NULL DEFAULT 0,
-            PRIMARY KEY (`c_id`)
-            ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;");
-  }
+  require_once MYBB_ROOT . "inc/plugins/risuena_updates/risuena_updatefile.php";
 
-  //table subcat
-  if (!$db->table_exists("relas_subcategories")) {
-    $db->query("CREATE TABLE `" . TABLE_PREFIX . "relas_subcategories` (
-            `sc_id` int(10) NOT NULL AUTO_INCREMENT,
-            `sc_name` varchar(100) NOT NULL DEFAULT '',
-            `sc_cid` int(10) NOT NULL  DEFAULT 0,
-            `sc_sort` int(10) NOT NULL DEFAULT 1,
-            `sc_uid` int(10) NOT NULL  DEFAULT 0,
-            PRIMARY KEY (`sc_id`)
-        ) ENGINE=MyISAM CHARACTER SET utf8 COLLATE utf8_general_ci;");
-  }
+  //installiert oder updated die nötigen Tabellen
+  risuenaupdatefile_sync_table(relations_db_schema());
 
   //einfügen der einstellung ob relas direkt rausgehen
   if (!$db->field_exists("relas_autoaccept", "users")) {
     $db->add_column("users", "relas_autoaccept", "INT(1) NOT NULL DEFAULT '0'");
   }
+  //einfügen der einstellung ob relas direkt rausgehen
+  if (!$db->field_exists("r_searchurl", "relas_entries")) {
+    $db->add_column("relas_entries", "r_searchurl", "varchar(250) NOT NULL DEFAULT ''");
+  }
+}
+
+/***
+ * Liefert die DB Struktur der Tabellen zurück, damit diese für die Install Routine oder Update Dateien genutzt werden kann
+ * @return array - DB Struktur der Tabellen
+ */
+function relations_db_schema()
+{
+  return [
+    "relas_entries" => [
+      "fields" => [
+        "r_id" => "int(10) NOT NULL AUTO_INCREMENT",
+        "r_to" => "int(10) NOT NULL DEFAULT 0",
+        "r_from" => "int(10) NOT NULL DEFAULT 0",
+        "r_kategorie" => "varchar(150) NOT NULL DEFAULT ''",
+        "r_kommentar" => "varchar(2555) NOT NULL DEFAULT ''",
+        "r_accepted" => "int(10) NOT NULL DEFAULT 0",
+        "r_npc" => "int(1) NOT NULL DEFAULT 0",
+        "r_npcname" => "varchar(150) NOT NULL DEFAULT ''",
+        "r_npcimg" => "varchar(250) NOT NULL DEFAULT ''",
+        "r_npcbirthyear" => "int(10) NOT NULL DEFAULT 0",
+        "r_npcdeathyear" => "int(10) NOT NULL DEFAULT 0",
+        "r_searched" => "varchar(250) NOT NULL DEFAULT ''",
+        "r_searchurl" => "varchar(250) NOT NULL DEFAULT ''",
+        "r_sort" => "int(10) NOT NULL DEFAULT 1",
+        "r_overview" => "varchar(250) NOT NULL DEFAULT ''"
+      ],
+      "primary" => "r_id",
+      "engine" => "InnoDB"
+    ],
+
+    "relas_categories" => [
+      "fields" => [
+        "c_id" => "int(10) NOT NULL AUTO_INCREMENT",
+        "c_name" => "varchar(100) NOT NULL DEFAULT ''",
+        "c_sort" => "int(10) NOT NULL DEFAULT 1",
+        "c_uid" => "int(10) NOT NULL DEFAULT 0"
+      ],
+      "primary" => "c_id",
+      "engine" => "InnoDB"
+    ],
+
+    "relas_subcategories" => [
+      "fields" => [
+        "sc_id" => "int(10) NOT NULL AUTO_INCREMENT",
+        "sc_name" => "varchar(100) NOT NULL DEFAULT ''",
+        "sc_cid" => "int(10) NOT NULL DEFAULT 0",
+        "sc_sort" => "int(10) NOT NULL DEFAULT 1",
+        "sc_uid" => "int(10) NOT NULL DEFAULT 0"
+      ],
+      "primary" => "sc_id",
+      "engine" => "InnoDB"
+    ],
+    //tables für default kategorien, die im acp angelegt werden können
+    "relas_categories_default" => [
+      "fields" => [
+        "cd_id" => "int(10) NOT NULL AUTO_INCREMENT",
+        "cd_name" => "varchar(100) NOT NULL DEFAULT ''",
+        "cd_sort" => "int(10) NOT NULL DEFAULT 1",
+      ],
+      "primary" => "cd_id",
+      "engine" => "InnoDB"
+    ],
+
+    "relas_subcategories_default" => [
+      "fields" => [
+        "scd_id" => "int(10) NOT NULL AUTO_INCREMENT",
+        "scd_name" => "varchar(100) NOT NULL DEFAULT ''",
+        "scd_cdid" => "int(10) NOT NULL DEFAULT 0",
+        "scd_sort" => "int(10) NOT NULL DEFAULT 1",
+      ],
+      "primary" => "scd_id",
+      "engine" => "InnoDB"
+    ]
+  ];
 }
 
 /*
- * Funktion relations_profile
- * Anzeige auf Profil des Users & sowie anfragen stellen
- * Anfragen bei einem User
- */
+* Funktion relations_profile
+* Anzeige auf Profil des Users & sowie anfragen stellen
+* Anfragen bei einem User
+*/
 $plugins->add_hook("member_profile_end", "relations_profile");
 function relations_profile()
 {
@@ -1222,7 +1442,12 @@ function relations_profile()
           $rela_name = $entry['r_npcname'];
           //Alter des NPCs
           if ($entry['r_npcbirthyear'] != "0") {
-            $userage = $mybb->settings['scenetracker_ingametime'] - $entry['r_npcbirthyear'] . " Jahre";
+            $ingameYear = (int)substr($mybb->settings['relas_ingamezeitraum'], 0, 4);
+            if ($entry['r_npcdeathyear'] != "0" && !empty($entry['r_npcdeathyear'])) {
+              $userage = ($entry['r_npcdeathyear'] - $entry['r_npcbirthyear']) . " Jahre († " . $entry['r_npcdeathyear'] . ")";
+            } else {
+              $userage = $ingameYear - $entry['r_npcbirthyear'] . " Jahre";
+            }
           } else {
             $userage = "";
           }
@@ -1253,13 +1478,14 @@ function relations_profile()
           $userage = relations_getage($entry['r_to']);
           $friend = get_user($entry['r_to']);
           if ($friend['uid'] == "") $friend['uid'] = -1;
-
+          $userjob = "";
+          $userjob = relations_getjob($friend['uid']);
           // dürfen gäste avatare sehen
           if ($thisuser == 0 && $opt_img_guest == 0) {
-            $rela_avatar = "<div class=\"entry__item ava\"><i class=\"fa-solid fa-circle-user\"></i></div>";
+            $rela_avatar = "<div class=\"entry__item ava avarund\"><i class=\"fa-solid fa-circle-user\"></i></div>";
           } else {
             //ausgabe bild
-            $rela_avatar = "<div class=\"entry__item ava\" style=\"background-image: url('{$friend['avatar']}');\"></div>";
+            $rela_avatar = "<div class=\"entry__item ava avarund\" style=\"background-image: url('{$friend['avatar']}');\"></div>";
           }
           //Existierender user -> wir wollen zum Profil verlinken
           $rela_name = build_profile_link($friend['username'], $friend['uid']);
@@ -1311,7 +1537,14 @@ function relations_profile()
       //to: wer muss die anfrage bestätigen
       "fromid" => $interessent,
       //from: wer hat die anfrage gestellt
-      "toid" => $profilid
+      "toid" => $profilid,
+      "signature" => 0,
+    );
+    $pm['options'] = array(
+      'signature' => '0',
+      'savecopy' => '0',
+      'disablesmilies' => '0',
+      'readreceipt' => '0',
     );
 
     // $pmhandler->admin_override = true;
@@ -1333,12 +1566,17 @@ function relations_profile()
     //Hiermit stellen wir fest, ob der anfragende überhaupt schon kategorien hat.
     $form_select = relations_getCats($thisuser);
     if ($form_select != "false") {
-      if ($mybb->user['uid'] != 0 && !is_member(7)) {
-	if ($mybb->settings['relas_nachwob'] == 1) {
-        	eval("\$relas_memberprofil_anfrage = \"" . $templates->get("relas_memberprofil_anfrage") . "\";");
-	} else if ($mybb->settings['relas_nachwob'] == 0 && !is_member($mybb->settings['relas_group'])) {
-		eval("\$relas_memberprofil_anfrage = \"" . $templates->get("relas_memberprofil_anfrage") . "\";");
-	}
+
+      if ($mybb->settings['relas_nachwob']) {
+        $relas_memberprofil_anfrage = "";
+        if (
+          !is_member($mybb->settings['relas_group'])
+          && $mybb->user['uid'] != 0
+        ) {
+          eval("\$relas_memberprofil_anfrage = \"" . $templates->get("relas_memberprofil_anfrage") . "\";");
+        }
+      } else {
+        eval("\$relas_memberprofil_anfrage = \"" . $templates->get("relas_memberprofil_anfrage") . "\";");
       }
     } else {
       $relas_memberprofil_anfrage = "<div class=\"rela-noncats\">Du hast noch keine Kategorien in deinem Profil angelegt. Bitte tu dies zuerst. Dann kannst du Anfragen an andere Charaktere schicken.</div>";
@@ -1394,7 +1632,7 @@ function relations_usercp_menu()
 {
   global $usercpmenu, $lang;
   $lang->load("relations");
-  $usercpmenu .= "<tr><td class=\"trow1 smalltext\"><a href=\"./usercp.php?action=relations\" class=\"usercp_nav_item usercp_nav_mecool\">{$lang->relations_ucpnav}</a></td></tr>";
+  // $usercpmenu .= "<tr><td class=\"trow1 smalltext\"><a href=\"./usercp.php?action=relations\" class=\"usercp_nav_item usercp_nav_mecool\">{$lang->relations_ucpnav}</a></td></tr>";
 }
 
 /*
@@ -1440,11 +1678,11 @@ function relations_usercp()
   $get_catstest = $db->simple_select("relas_categories", "*", "c_uid = {$thisuser}", array('order_by' => 'c_sort'));
 
   if ($db->num_rows($get_catstest) <= 0) {
-    $dostandardcats = "<input form=\"catstandard\" name=\"standardcat\" type=\"submit\" value=\"Erstellen\" onClick=\"return confirm('Standardkategorien anlegen? Achtung: Wenn du schon welche erstellt hast, werden sie zusätzlich hinzugefügt.');\"/>";
+    $dostandardcats = "<input form=\"catstandard\" name=\"standardcat\" class=\"button\" type=\"submit\" value=\"Erstellen\" onClick=\"return confirm('Standardkategorien anlegen? Achtung: Wenn du schon welche erstellt hast, werden sie zusätzlich hinzugefügt.');\"/>";
   } else {
     $dostandardcats = "<p><span class=\"alert_warn\">Achtung!</span><br />
                 Du hast schon eigene Kategorien, wenn du den Button drückst, werden die Standardkategorien <b>zusätzlich</b> hinzugefügt.<br />
-                <input form=\"catstandard\" name=\"standardcat\" type=\"submit\" value=\"Erstellen\" onClick=\"return confirm('Standardkategorien anlegen? Achtung: Wenn du schon welche erstellt hast, werden sie zusätzlich hinzugefügt.');\"/></p>";
+                <input form=\"catstandard\" class=\"button\" name=\"standardcat\" type=\"submit\" value=\"Erstellen\" onClick=\"return confirm('Standardkategorien anlegen? Achtung: Wenn du schon welche erstellt hast, werden sie zusätzlich hinzugefügt.');\"/></p>";
   }
 
   //template zurücksetzen
@@ -1476,7 +1714,7 @@ function relations_usercp()
     if (!empty($cat['sc_sort'])) $sortcatvalue = $cat['sc_sort'];
 
     //edit link bauen (Popup anzeigen bei klick)
-    $editcatmod = "<a onclick=\"$('#cedit{$cid}').modal({ fadeDuration: 250, keepelement: true, zIndex: (typeof modal_zindex !== 'undefined' ? modal_zindex : 9999) }); return false;\" style=\"cursor: pointer;\">[e]</a>";
+    // $editcatmod = "<a href=\"#\" onclick=\"$('#cedit{$cid}').modal({ fadeDuration: 250, keepelement: true, zIndex: (typeof modal_zindex !== 'undefined' ? modal_zindex : 9999) }); return false;\" style=\"cursor: pointer;\">[e]</a>";
     //Dazu gehörende Unterkategorien durchgehen
     while ($subcat = $db->fetch_array($get_subcats)) {
 
@@ -1496,34 +1734,25 @@ function relations_usercp()
       }
       $hauptkategoriesub .= "</select>"; //abschließen
 
-      //edit link bauen (Popup anzeigen bei link)
-      $editscatmod = "<a onclick=\"$('#scedit{$scid}').modal({ fadeDuration: 250, keepelement: true, zIndex: (typeof modal_zindex !== 'undefined' ? modal_zindex : 9999) }); return false;\" style=\"cursor: pointer;\">[e]</a>";
       eval("\$relas_ucp_managesubcat .= \"" . $templates->get("relas_ucp_managesubcat") . "\";");
     }
     $hauptkategoriesub = "";
 
     eval("\$relas_ucp_managecat .= \"" . $templates->get("relas_ucp_managecat") . "\";");
-}
-if ($mybb->user['uid'] != 0 && !is_member(7)) {
-	if ($mybb->settings['relas_nachwob'] == 1) {
-		eval("\$relas_ucp_manage = \"" . $templates->get("relas_ucp_manage") . "\";");
-	} else if ($mybb->settings['relas_nachwob'] == 0 && !is_member($mybb->settings['relas_group'])) {
-		eval("\$relas_ucp_manage = \"" . $templates->get("relas_ucp_manage") . "\";");
-	} else {
-		$relas_ucp_manage = "";
-	}
-}
+  }
 
-	
-//  if (
-//    ($mybb->settings['relas_nachwob'] == 1 && !is_member($mybb->settings['relas_group']))
-//    && $mybb->user['uid'] != 0
-//    && !is_member(7)
-//  ) {
-//    eval("\$relas_ucp_manage = \"" . $templates->get("relas_ucp_manage") . "\";");
-//  } else {
-//    $relas_ucp_manage = "";
-//  }
+  if ($mybb->settings['relas_nachwob']) {
+    if (
+      !is_member($mybb->settings['relas_group'])
+      && $mybb->user['uid'] != 0
+    ) {
+      eval("\$relas_ucp_manage = \"" . $templates->get("relas_ucp_manage") . "\";");
+    } else {
+      $relas_ucp_manage = "";
+    }
+  } else {
+    eval("\$relas_ucp_manage = \"" . $templates->get("relas_ucp_manage") . "\";");
+  }
 
   //Verarbeitung der Formulardaten 
   //Standardkategorien erstelle
@@ -1655,6 +1884,7 @@ if ($mybb->user['uid'] != 0 && !is_member(7)) {
         "r_npc" => 1,
         "r_npcname" => $db->escape_string($mybb->get_input('npcname', MyBB::INPUT_STRING)),
         "r_npcbirthyear" => $mybb->get_input('npcbirthyear', MyBB::INPUT_INT),
+        "r_npcdeathyear" => $mybb->get_input('npcdeathyear', MyBB::INPUT_INT),
         "r_searched" => $mybb->get_input('rela_searched', MyBB::INPUT_INT),
         "r_npcimg" => $db->escape_string($mybb->get_input('npcimg', MyBB::INPUT_STRING)),
         "r_searchurl" => $db->escape_string($mybb->get_input('searchurl', MyBB::INPUT_STRING)),
@@ -1763,7 +1993,7 @@ if ($mybb->user['uid'] != 0 && !is_member(7)) {
     }
 
     $get_cats = $db->simple_select("relas_categories", "*", "c_uid = '{$thisuser}'");
-    $cats = "<select name=\"kategorie\" size=\"3\" id=\"kategorien\" required>";
+    $cats = "<select name=\"kategorie\" size=\"5\" id=\"kategorien\" required>";
     while ($cat = $db->fetch_array($get_cats)) {
       $cats .= "<optgroup label=\"{$cat['c_name']}\">";
       $get_subcats = $db->simple_select("relas_subcategories", "*", "sc_cid={$cat['c_id']}");
@@ -1821,7 +2051,7 @@ if ($mybb->user['uid'] != 0 && !is_member(7)) {
   //Haben dich eingetragen aber du sie nicht
   $denied_query = $db->write_query("SELECT * FROM " . TABLE_PREFIX . "relas_entries WHERE r_from = '{$thisuser}' AND r_accepted = -1");
   if ($db->num_rows($denied_query) > 0) {
-    $relas_ucp_notaddedbit = "";
+    $relas_ucp_denied_bit = "";
     while ($denied = $db->fetch_array($denied_query)) {
       $user = get_user($denied['r_from']);
       $username = build_profile_link($user['username'], $user['uid']);
@@ -1829,13 +2059,20 @@ if ($mybb->user['uid'] != 0 && !is_member(7)) {
       $subcat_add = $db->fetch_array($db->simple_select("relas_subcategories", "*", "sc_id = {$denied['r_kategorie']}"));
       $subkategorie = $subcat_add['sc_name'];
       //Zeige Kommentar zur Beziehung, wenn vorhanden.
-      if ($notadd['r_kommentar'] != "") {
+      if ($denied['r_kommentar'] != "") {
         $kommentar = "	<div class=\"ucprelas-requestuser__item kommentar\">{$denied['r_kommentar']} </div>";
       } else {
         $kommentar = "";
       }
+      //Welche Hauptkategorie? 
+      if ($subcat_add['sc_cid'] == "") {
+        $subcat_add['sc_cid'] = 0;
+      }
+      $cat_add = $db->fetch_array($db->simple_select("relas_categories", "*",  "c_id = {$subcat_add['sc_cid']}"));
+      $haupt = $cat_add['c_name'];
+
       $get_cats = $db->simple_select("relas_categories", "*", "c_uid = {$thisuser}");
-      $cats = "<select name=\"kategorie\" size=\"3\" id=\"kategorien\" required>";
+      $cats = "<select name=\"kategorie\" size=\"5\" id=\"kategorien\" required>";
       while ($cat = $db->fetch_array($get_cats)) {
         $cats .= "<optgroup label=\"{$cat['c_name']}\">";
         $get_subcats = $db->simple_select("relas_subcategories", "*", "sc_cid={$cat['c_id']}");
@@ -1850,9 +2087,9 @@ if ($mybb->user['uid'] != 0 && !is_member(7)) {
       }
       $cats .= "</select>";
 
-      eval("\$relas_ucp_denied_bit .= \"" . $templates->get("relas_ucp_notaddedbit") . "\";");
+      eval("\$relas_ucp_denied_bit .= \"" . $templates->get("relas_ucp_denied_bit") . "\";");
     }
-    eval("\$relas_ucp_denied = \"" . $templates->get("relas_ucp_notadded") . "\";");
+    eval("\$relas_ucp_denied = \"" . $templates->get("relas_ucp_denied") . "\";");
   }
 
   //Akzeptieren
@@ -2094,6 +2331,7 @@ if ($mybb->user['uid'] != 0 && !is_member(7)) {
     $rela_anfrage = array(
       "r_npcname" => $db->escape_string($mybb->get_input('e_rela_npcname', MyBB::INPUT_STRING)),
       "r_npcbirthyear" => $mybb->get_input('e_rela_npcbirthyear', MyBB::INPUT_INT),
+      "r_npcdeathyear" => $mybb->get_input('e_rela_npcdeathyear', MyBB::INPUT_INT),
       "r_searched" => $mybb->get_input('e_rela_searched', MyBB::INPUT_INT),
       "r_npcimg" => $db->escape_string($mybb->get_input('e_rela_npcimg', MyBB::INPUT_STRING)),
       "r_kategorie" => $db->escape_string($mybb->get_input('kategorie', MyBB::INPUT_STRING)),
@@ -2103,6 +2341,41 @@ if ($mybb->user['uid'] != 0 && !is_member(7)) {
     );
     $db->update_query("relas_entries", $rela_anfrage, "r_id = {$rid}");
 
+    redirect('usercp.php?action=relations');
+  }
+
+  //rela neu schicken
+  if (isset($mybb->input['e_rela_again'])) {
+
+    $touser = $mybb->get_input('e_rela_to');
+    $touserinfo = get_user($touser);
+    $autoaccept = $touserinfo['relas_autoaccept'];
+
+    //id der Unterkategorie
+    $rid = $mybb->get_input('e_rela_id', MyBB::INPUT_INT);
+    $rela_anfrage = array(
+      "r_kategorie" => $db->escape_string($mybb->get_input('kategorie', MyBB::INPUT_STRING)),
+      "r_searchurl" => $db->escape_string($mybb->get_input('searchurl', MyBB::INPUT_STRING)),
+      "r_kommentar" => $db->escape_string($mybb->get_input('e_rela_kom', MyBB::INPUT_STRING)),
+      "r_accepted" => $autoaccept,
+      "r_sort" => $mybb->get_input('e_rela_sort', MyBB::INPUT_INT),
+    );
+    $db->update_query("relas_entries", $rela_anfrage, "r_id = {$rid}");
+    if ($opt_accept == 1) {
+      if (class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
+        $alertType = MybbStuff_MyAlerts_AlertTypeManager::getInstance()->getByCode('relation_request');
+        if ($alertType != NULL && $alertType->getEnabled()) {
+          //constructor for MyAlert gets first argument, $user (not sure), second: type  and third the objectId 
+          $alert = new MybbStuff_MyAlerts_Entity_Alert($touser, $alertType);
+          //some extra details
+          $alert->setExtraDetails([
+            'fromuser' => $mybb->user['uid']
+          ]);
+          //add the alert
+          MybbStuff_MyAlerts_AlertManager::getInstance()->addAlert($alert);
+        }
+      }
+    }
     redirect('usercp.php?action=relations');
   }
 
@@ -2119,10 +2392,71 @@ if ($mybb->user['uid'] != 0 && !is_member(7)) {
   output_page($relas_ucp);
 }
 
+/**
+ * Zeigt im Profil die Gesuchten NPCs an
+ */
+$plugins->add_hook("member_profile_end", "relations_profile_wantednpcs");
+function relations_profile_wantednpcs()
+{
+  global $db, $mybb, $templates, $memprofile, $relas_memprofile_searchbit;
+  $relas_memprofile_searchbit = "";
+  $get_npcs = $db->simple_select("relas_entries", "*", "r_from = '{$memprofile['uid']}' AND r_npc = 1 and r_searched = 1 and r_npcdeathyear = 0");
+  $relas_memberprofil_npcsearch = "";
+  while ($relauser = $db->fetch_array($get_npcs)) {
+
+
+    if ($mybb->settings['relas_npc_img'] == 1 && !empty($relauser['r_npcimg'])) {
+      $img = "<img src=\"" . $relauser['r_npcimg'] . "\" alt=\"NPC Bild\" style=\"width:" . $mybb->settings['relas_img_width'] . "px;\">";
+    } else {
+      $img = "";
+    }
+
+    if (!empty($relauser['r_searchurl'])) {
+      $link = "<a href=\"" . $relauser['r_searchurl'] . "\">{$relauser['r_npcname']}</a>";
+    } else {
+      $link = $relauser['r_npcname'];
+    }
+
+    if (!empty($relauser['r_kommentar'])) {
+      $descr = $relauser['r_kommentar'];
+    }
+
+    if (!empty($relauser['r_npcbirthyear'])) {
+      if ($relauser['r_npcbirthyear'] != "0") {
+        $ingameYear = (int)substr($mybb->settings['relas_ingamezeitraum'], 0, 4);
+
+        $userage = $ingameYear - $relauser['r_npcbirthyear'] . " Jahre";
+      } else {
+        $userage = "";
+      }
+    } else {
+      $userage = "";
+    }
+    if (!empty($relauser['r_kategorie'])) {
+      $relation = $db->fetch_field($db->simple_select("relas_subcategories", "sc_name", "sc_id = {$relauser['r_kategorie']}"), "sc_name");
+    }
+
+    $rid = $relauser['r_id'];
+    $npc_searchname =  $relauser['r_npcname'];
+    //captcha
+    $guest_searchpn = "";
+    if ($mybb->user['uid'] == 0) {
+      eval("\$guest_searchpn = \"" . $templates->get("relas_guest_searchpn") . "\";");
+    }
+    eval("\$relas_memberprofil_npcsearch = \"" . $templates->get("relas_memberprofil_npcsearch") . "\";");
+    // $relation
+
+    if (empty($relauser['r_searchurl'])) {
+      eval("\$relas_memprofile_searchbit .= \"" . $templates->get("relas_memprofile_searchbit") . "\";");
+    }
+  }
+}
+
 function relations_getuserucp($query, $all, $allsubs)
 {
-  global $db, $templates, $mybb, $relas_ucp_alluser, $cats, $birthyear;
+  global $db, $templates, $mybb, $relas_ucp_alluser, $cats, $birthyear, $editname, $editname_sail;
   $thisuser = $mybb->user['uid'];
+  $editname = $editname_sail = "";
   //Einstellungen
   $opt_npc = intval($mybb->settings['relas_npc']);
   $opt_npc_img = intval($mybb->settings['relas_npc_img']);
@@ -2133,6 +2467,7 @@ function relations_getuserucp($query, $all, $allsubs)
     $rid = $relauser['r_id'];
     //NPCs weerden beim edit anders behandelt (man kann den namen und das bild ändern)
     if ($relauser['r_npc'] == 1) {
+
       $usernamenolink = $relauser['r_npcname'];
       $username = $relauser['r_npcname'];
       $birthyear = $relauser['r_npcbirthyear'];
@@ -2144,37 +2479,20 @@ function relations_getuserucp($query, $all, $allsubs)
         $searchchecked_y = "";
         $searchchecked_n = "CHECKED";
       }
+      $searchmark = "";
+      if ($searchchecked == 1) {
+        $searchmark = "<div class=\"relas-ucp__npc-searched--yes\"><i class=\"fa-solid fa-user-magnifying-glass\"></i> als gesucht markiert</div>";
+      }
       // echo "r_npcbirthyear" . $relauser['r_npcbirthyear'];
       //TODO
 
-      $editname = "<div class =\"model-form\">
-                      <label for=\"e_rela_npcname{$rid}\">NPC Name</label>
-                      <input id=\"e_rela_npcname{$rid}\" type=\"text\" value=\"{$username}\" name=\"e_rela_npcname\" required>
-                      </div>
-                      <div class =\"model-form\">
-                      <label>Darf übernommen werden?</label>
-                      <span style=\"justify-self:start;\">
-                        <input type=\"radio\" name=\"e_rela_searched\" {$searchchecked_y} id=\"e_rela_searched_yes\" value=\"1\">
-                        <span> Ja</span>
-                        <input type=\"radio\" name=\"e_rela_searched\" {$searchchecked_n} id=\"e_rela_searched_no\" value=\"0\">
-                        <span> Nein<span>
-                        </span>
-                      </div>
-                      <div class =\"model-form\">
-                      <label for=\"e_rela_searchurl{$rid}\">URL zu Gesuch</label>
-                      <input type=\"url\" id=\"e_rela_searchurl{$rid}\" value=\"" . $relauser['r_searchurl'] . "\" name=\"searchurl\">
-                      </div>
-                      <div class =\"model-form\">
-                      <label for=\"e_rela_npcbirthyear{$rid}\">NPC Geburtsjahr</label>
-                      <input type=\"number\" id=\"e_rela_npcbirthyear{$rid}\" value=\"" . $relauser['r_npcbirthyear'] . "\" name=\"e_rela_npcbirthyear\">
-                      </div>";
+      eval("\$editname .= \"" . $templates->get("relas_ucp_editnpc") . "\";");
+      eval("\$editname_sail .= \"" . $templates->get("relas_ucp_editnpc") . "\";");
+
       //Wenn Bilder für npcs erlaubt:
       if ($opt_npc_img == 1) {
         $userimg = $relauser['r_npcimg'];
-        $npc_editimg = " <div class =\"model-form\">
-                          <label for=\"e_rela_npcimg{$rid}\">NPC Img</label>
-                          <input id=\"e_rela_npcimg{$rid}\" type=\"text\" value=\"{$userimg}\" name=\"e_rela_npcimg\">
-                          </div>";
+        eval("\$npc_editimg .= \"" . $templates->get("relas_ucp_npc_editimg") . "\";");
       } else {
         $userimg = "";
         $npc_editimg = "";
@@ -2187,6 +2505,7 @@ function relations_getuserucp($query, $all, $allsubs)
       //username als link
       $usernamenolink = $user['username'];
       $username = build_profile_link($user['username'], $user['uid']);
+      $editname_sail = "<div class=\"model-form modal__formitem\"><a href=\"member.php?action=profile&uid={$user['uid']}\" class=\"bl-heading3\">" . $user['username'] . "</a></div>";
       $userimg = $user['avatar'];
       $editname = $username;
     }
@@ -2196,7 +2515,7 @@ function relations_getuserucp($query, $all, $allsubs)
     $kommentar = "<div class=\"ucprelas-user__item kommentar\">" . ($relauser['r_kommentar']) . "</div>";
 
     $get_cats = $db->simple_select("relas_categories", "*", "c_uid = {$thisuser}");
-    $cats = "<select name=\"kategorie\" size=\"3\" id=\"kategorien\" required>";
+    $cats = "<select name=\"kategorie\" size=\"5\" id=\"kategorien\" required>";
     while ($cat = $db->fetch_array($get_cats)) {
       $cats .= "<optgroup label=\"{$cat['c_name']}\">";
       $get_subcats = $db->simple_select("relas_subcategories", "*", "sc_cid={$cat['c_id']}");
@@ -2225,7 +2544,7 @@ function relations_getCats($uid)
   $test_cat = $db->num_rows($get_cats);
   if ($test_cat > 0) {
     //Vorbereitung für das Formular - Wir brauchen ein Select mit allen Haupt-und Unterkategorien
-    $form_select = "<select name=\"kategorie\" size=\"3\" id=\"kategorien\" required>";
+    $form_select = "<select name=\"kategorie\" size=\"5\" id=\"kategorien\" required>";
     //Die Hauptkategorien durchgehen
     while ($cat = $db->fetch_array($get_cats)) {
       //Wir wollen das Select etwas gruppieren
@@ -2283,7 +2602,7 @@ function relations_checkCats($uid)
  * Relas bei anderen zu npc umtragen
  * die relas des users löschen
  */
-$plugins->add_hook("admin_user_users_delete_commit_end", "user_delete");
+$plugins->add_hook("admin_user_users_delete_commit_end", "relations_user_delete");
 function relations_user_delete()
 {
   global $db, $cache, $mybb, $user;
@@ -2574,29 +2893,67 @@ function relations_alert()
 function relations_getage($uid)
 {
   global $mybb, $db;
+  $ingameTime = new DateTime($mybb->settings['relas_ingamezeitraum'] . '-01');
+  $computedAge = '';
 
-  // $ingameTime = new DateTime($mybb->settings['memberstats_ingamemonat_tag_end'] . "." . $lastingamemonth . "." . $mybb->settings['memberstats_ingamejahr']);
-  // scenetracker_ingametime
-  $computedAge = "";
-  if (isset($mybb->settings['scenetracker_ingametime'])) {
-    $ingame =  explode(",", str_replace(" ", "", $mybb->settings['scenetracker_ingametime']));
-    foreach ($ingame as $monthyear) {
-      $ingamelastday = $monthyear . "-" .  sprintf("%02d", $mybb->settings['scenetracker_ingametime_tagend']);
+  // Geburtstag holen
+  $birthday = '';
+
+  if ($mybb->settings['relas_birthday'] === 'mybb') {
+
+    $birthday = $db->fetch_field(
+      $db->simple_select('users', 'birthday', "uid = '{$uid}'"),
+      'birthday'
+    );
+    $birthdate = DateTime::createFromFormat('!j-n-Y', $birthday);
+    if ($birthdate !== false) {
+      $output = $birthdate->format('Y-m-d');
     }
+  } elseif ($mybb->settings['relas_birthday'] === 'fid') {
 
-    $ingameTime = new DateTime($ingamelastday);
+    $birthday = $db->fetch_field(
+      $db->simple_select(
+        'userfields',
+        'fid' . (int)$mybb->settings['relas_fid'],
+        "ufid = '{$uid}'"
+      ),
+      'fid' . (int)$mybb->settings['relas_fid']
+    );
+    $birthdate = DateTime::createFromFormat('!d.m.Y', $birthday);
+    if ($birthdate !== false) {
+      $output = $birthdate->format('Y-m-d');
+    }
+  } elseif ($mybb->settings['relas_birthday'] === 'risu') {
 
-    $ufid = $db->fetch_field($db->simple_select("application_ucp_userfields", "*", "uid = {$uid} AND fieldid = 3"), "value");
+    $fieldid = (int)$db->fetch_field(
+      $db->simple_select(
+        'application_ucp_fields',
+        'id',
+        "fieldname = '{$db->escape_string($mybb->settings['relas_risu'])}'"
+      ),
+      'id'
+    );
 
-    // $ufid = $db->fetch_field($db->simple_select("userfields", "fid4", "ufid = {$uid}"), "fid4");
-    $birthdate = new DateTime($ufid);
-
+    $birthday = $db->fetch_field(
+      $db->simple_select(
+        'application_ucp_userfields',
+        'value',
+        "uid = '{$uid}' AND fieldid = '{$fieldid}'"
+      ),
+      'value'
+    );
+    $birthdate = DateTime::createFromFormat('!Y-m-d', $birthday);
+    if ($birthdate !== false) {
+      $output = $birthdate->format('Y-m-d');
+    }
+  }
+  // Nur berechnen, wenn Datum gültig ist
+  if ($birthdate instanceof DateTime) {
     $age = $ingameTime->diff($birthdate);
-    $computedAge = $age->format("%Y Jahre");
+    $computedAge = $age->format('%Y Jahre');
   }
   return  $computedAge;
 }
-
 
 /**************************** 
  * 
@@ -2607,8 +2964,457 @@ if (class_exists('MybbStuff_MyAlerts_AlertTypeManager')) {
   $plugins->add_hook("global_start", "relations_alert");
 }
 
+/***
+ * ACP Verwaltung - Anlegen von Kategorien. Verwaltung über Laras RPG Moduk
+ */
 
+/**
+ * Relations Menü im ACP einfügen
+ */
 
+/**
+ * action handler fürs ACP -> Konfiguration
+ */
+$plugins->add_hook("admin_rpgstuff_action_handler", "relations_admin_rpgstuff_action_handler");
+function relations_admin_rpgstuff_action_handler(&$actions)
+{
+  $actions['relations'] = array('active' => 'relations', 'file' => 'relations');
+}
+
+$plugins->add_hook("admin_rpgstuff_menu", "relations_admin_rpgstuff_menu");
+function relations_admin_rpgstuff_menu(&$sub_menu)
+{
+  global $mybb, $lang;
+  $lang->load("relations");
+
+  $sub_menu[] = [
+    "id" => "relations",
+    "title" => $lang->relations_acp,
+    "link" => "index.php?module=rpgstuff-relations"
+  ];
+}
+
+$plugins->add_hook("admin_load", "relations_admin_load");
+function relations_admin_load()
+{
+  global $mybb, $db, $lang, $page, $run_module, $action_file;
+  $lang->load("relations");
+
+  if ($page->active_action != 'relations') {
+    return false;
+  }
+  if ($run_module == 'rpgstuff' && $action_file == 'relations') {
+
+    if ($mybb->input['action'] == "" || !isset($mybb->input['action'])) {
+      $page->add_breadcrumb_item($lang->relations_acp_overview);
+      $page->output_header($lang->relations_acp_overview);
+
+      //sub menü erstellen
+      $sub_tabs = relations_do_submenu();
+      $page->output_nav_tabs($sub_tabs, 'relations');
+
+      // fehleranzeige
+      if (isset($errors)) {
+        $page->output_inline_error($errors);
+      }
+
+      $page->output_alert($lang->relations_warning);
+      // flash_message($lang->relations_addsubcat_success, 'warning');
+      $form = new Form("index.php?module=rpgstuff-relations", "post");
+      $form_container = new FormContainer($lang->relations_acp_overview);
+      $form_container->output_row_header("vorhandene Kategorien");
+      $form_container->output_row_header("<div style=\"text-align: center;\">{$lang->relations_acp}</div>");
+
+      //alle vorhandenen Hauptkategorien bekommen
+      $get_maincats = $db->simple_select("relas_categories_default");
+      //es wurden noch keine Hauptkategorien angelegt
+      if ($db->num_rows($get_maincats) == 0) {
+        $form_container->output_cell("Keine Kategorien vorhanden");
+        $form_container->output_cell("<a href=\"index.php?module=rpgstuff-relations&amp;action=relations_add_cats\" class=\"button\">{$lang->relations_acp_addcats}</a></div>", array("class" => "align_center"));
+        $form_container->construct_row();
+      }
+      //vorhandene Hauptkategorien durchgehen
+      while ($maincat = $db->fetch_array($get_maincats)) {
+        $form_container->output_cell('<strong>' . htmlspecialchars_uni($maincat['cd_name']) . '</strong>');
+        $popup = new PopupMenu("relations_{$maincat['cd_id']}", $lang->relations_acp_manage_cat);
+        $popup->add_item(
+          "{$maincat['cd_name']} bearbeiten",
+          "index.php?module=rpgstuff-relations&amp;action=relations_maincat_edit&amp;id={$maincat['cd_id']}"
+        );
+        $popup->add_item(
+          "{$maincat['cd_name']} löschen",
+          "index.php?module=rpgstuff-relations&amp;action=relations_maincat_delete&amp;id={$maincat['cd_id']}",
+          "return confirm('Bist du sicher, dass du diese Kategorie löschen möchtest? Alle Unterkategorien dieser Kategorie werden ebenfalls gelöscht.')"
+        );
+        $form_container->output_cell($popup->fetch(), array("class" => "align_center"));
+
+        $form_container->construct_row();
+
+        //für jede Hauptkategorie die Unterkategorien bekommen
+        $get_subcats = $db->simple_select("relas_subcategories_default", "*", "scd_cdid = {$maincat['cd_id']}");
+        if ($db->num_rows($get_subcats) == 0) {
+          $form_container->output_cell('<i style="padding-left: 20px;">Keine Unterkategorien</i>');
+
+          $form_container->output_cell(
+            "<a href=\"index.php?module=rpgstuff-relations&amp;action=relations_add_subcats&amp;cid={$maincat['cd_id']}\" class=\"button smalltext\">{$lang->relations_acp_addsubcats}</a>",
+            array("class" => "align_center")
+          );
+
+          $form_container->construct_row();
+        }
+        while ($subcat = $db->fetch_array($get_subcats)) {
+          $form_container->output_cell('<i style="padding-left: 20px;">' . htmlspecialchars_uni($subcat['scd_name']) . '</i>');
+          
+          $popup_sub = new PopupMenu("relations_sub_edit{$subcat['scd_id']}", $lang->relations_acp_manage_sub);
+          $popup_sub->add_item(
+            "{$subcat['scd_name']} bearbeiten",
+            "index.php?module=rpgstuff-relations&amp;action=relations_subcat_edit&amp;id={$subcat['scd_id']}"
+          );
+          $popup_sub->add_item(
+            "{$subcat['scd_name']} löschen",
+            "index.php?module=rpgstuff-relations&amp;action=relations_subcat_delete&amp;id={$subcat['scd_id']}",
+            "return confirm('Bist du sicher, dass du diese Unterkategorie löschen möchtest?')"
+          );
+          $form_container->output_cell($popup_sub->fetch(), array("class" => "align_center"));
+
+          $form_container->construct_row();
+        }
+      }
+      $form_container->end();
+      $form->end();
+      $page->output_footer();
+      die();
+    }
+
+    //hauptkategorie hinzufügen
+    if ($mybb->get_input('action') == "relations_add_cats") {
+      $page->add_breadcrumb_item($lang->relations_acp_addcats);
+      $page->output_header($lang->relations_acp_addcats);
+      $sub_tabs = relations_do_submenu();
+      $page->output_nav_tabs($sub_tabs, 'relations_add_cats');
+
+      //Speichern
+      if ($mybb->request_method == "post") {
+        if (empty($mybb->input['name'])) {
+          $errors[] = $lang->relations_addcat_error_noname;
+        }
+        if (strlen($mybb->input['name']) > 50) {
+          $errors[] = $lang->relations_addcat_error_longname;
+        }
+        // Überprüfen, ob es die Kategorie schon gibt
+        $existing_cat = $db->fetch_field($db->simple_select("relas_categories_default", "cd_id", "cd_name = '" . $db->escape_string($mybb->input['name']) . "'"), "cd_id");
+        if ($existing_cat) {
+          $errors[] = $lang->relations_addcat_error_exists;
+        }
+        // Wenn keine Fehler, dann speichern
+        if (!isset($errors)) {
+          $insert_array = array(
+            'cd_name' => $db->escape_string($mybb->input['name']),
+            'cd_sort' => (int)$mybb->input['order']
+          );
+          $db->insert_query("relas_categories_default", $insert_array);
+          flash_message($lang->relations_addcat_success, 'success');
+          admin_redirect("index.php?module=rpgstuff-relations&amp;action=relations_add_cats");
+        }
+        // fehleranzeige
+        if (isset($errors)) {
+          $page->output_inline_error($errors);
+        }
+      }
+      //formular zum hinzufügen erstellen
+      $form = new Form("index.php?module=rpgstuff-relations&amp;action=relations_add_cats", "post", "", 1);
+      $form_container = new FormContainer($lang->relations_acp_addcats);
+      //Name der Kategorie
+      $form_container->output_row(
+        $lang->relations_addcat_name, //Name 
+        $lang->relations_addcat_name_descr,
+        $form->generate_text_box('name', "", array('required' => true))
+      );
+      //Darstellungsreihenfolge
+      $form_container->output_row(
+        $lang->relations_addcat_order, //Reihenfolge numerisch
+        $lang->relations_addcat_order_descr,
+        $form->generate_numeric_field('order', 1, array('min' => 0))
+      );
+
+      $form_container->end();
+      $buttons[] = $form->generate_submit_button($lang->relations_btn_add);
+      $form->output_submit_wrapper($buttons);
+      $form->end();
+      $page->output_footer();
+      die();
+    }
+
+    //Hauptkategorie bearbeiten
+    if ($mybb->get_input('action') == "relations_maincat_edit") {
+      if ($mybb->request_method == "post") {
+        $id = (int)$mybb->get_input('id');
+        if (empty($mybb->input['name'])) {
+          $errors[] = $lang->relations_addcat_error_noname;
+        }
+        if (strlen($mybb->input['name']) > 50) {
+          $errors[] = $lang->relations_addcat_error_longname;
+        }
+        // Überprüfen, ob es die Kategorie schon gibt
+        $existing_cat = $db->fetch_field($db->simple_select("relas_categories_default", "cd_id", "cd_name = '" . $db->escape_string($mybb->input['name']) . "' AND cd_id != '{$id}'"), "cd_id");
+        if ($existing_cat) {
+          $errors[] = $lang->relations_addcat_error_exists;
+        }
+        // Wenn keine Fehler, dann speichern
+        if (!isset($errors)) {
+          $update_array = array(
+            'cd_name' => $db->escape_string($mybb->input['name']),
+            'cd_sort' => (int)$mybb->input['order']
+          );
+          $db->update_query("relas_categories_default", $update_array, "cd_id = '{$id}'");
+          flash_message($lang->relations_editcat_success, 'success');
+          admin_redirect("index.php?module=rpgstuff-relations");
+        }
+      }
+
+      // fehleranzeige
+      if (isset($errors)) {
+        $page->output_inline_error($errors);
+      }
+      $page->add_breadcrumb_item($lang->relations_acp_editmaincat);
+      $page->output_header($lang->relations_acp_editmaincat);
+      $sub_tabs = relations_do_submenu("edit_maincat");
+      $page->output_nav_tabs($sub_tabs, 'relations_edit_maincat');
+
+      $id = (int)$mybb->get_input('id');
+      $category = $db->fetch_array($db->simple_select("relas_categories_default", "*", "cd_id = '{$id}'"));
+      //formular zum bearbeiten erstellen
+      $form = new Form("index.php?module=rpgstuff-relations&amp;action=relations_maincat_edit&amp;id={$id}", "post", "", 1);
+      $form_container = new FormContainer($lang->relations_acp_editmaincat);
+      //Name der Kategorie
+      $form_container->output_row(
+        $lang->relations_addcat_name, //Name
+        $lang->relations_addcat_name_descr,
+        $form->generate_text_box('name', $category['cd_name'], array('required' => true))
+      );
+      //Darstellungsreihenfolge
+      $form_container->output_row(
+        $lang->relations_addcat_order, //Reihenfolge numerisch
+        $lang->relations_addcat_order_descr,
+        $form->generate_numeric_field('order', $category['cd_sort'], array('min' => 0))
+      );
+      $form_container->end();
+      $buttons[] = $form->generate_submit_button($lang->relations_btn_save);
+      $form->output_submit_wrapper($buttons);
+      $form->end();
+      $page->output_footer();
+      die();
+    }
+
+    //Hauptkategorie löschen
+    if ($mybb->get_input('action') == "relations_maincat_delete") {
+      $id = (int)$mybb->get_input('id');
+      $db->delete_query("relas_categories_default", "cd_id = '{$id}'");
+      $db->delete_query("relas_subcategories_default", "scd_cdid = '{$id}'");
+      flash_message($lang->relations_deletecat_success, 'success');
+      admin_redirect("index.php?module=rpgstuff-relations");
+    }
+
+    // Unterkategorie hinzufügen
+    if ($mybb->get_input('action') == "relations_add_subcats") {
+      $page->add_breadcrumb_item($lang->relations_acp_addsubcats);
+      $page->output_header($lang->relations_acp_addsubcats);
+      $sub_tabs = relations_do_submenu();
+      $page->output_nav_tabs($sub_tabs, 'relations_add_subcats');
+
+      //speichern
+      if ($mybb->request_method == "post") {
+        if (empty($mybb->input['name'])) {
+          $errors[] = $lang->relations_addsubcat_error_noname;
+        }
+        if (strlen($mybb->input['name']) > 50) {
+          $errors[] = $lang->relations_addsubcat_error_longname;
+        }
+        if (empty($mybb->input['cid'])) {
+          $errors[] = $lang->relations_addsubcat_error_nocat;
+        }
+        // Überprüfen, ob es die Kategorie schon gibt
+        $existing_subcat = $db->fetch_field($db->simple_select("relas_subcategories_default", "scd_id", "scd_name = '" . $db->escape_string($mybb->input['name']) . "' AND scd_cdid = '" . (int)$mybb->input['cid'] . "'"), "scd_id");
+        if ($existing_subcat) {
+          $errors[] = $lang->relations_addsubcat_error_exists;
+        }
+        // Wenn keine Fehler, dann speichern
+        if (!isset($errors)) {
+          $insert_array = array(
+            'scd_name' => $db->escape_string($mybb->input['name']),
+            'scd_cdid' => (int)$mybb->input['cid'],
+            'scd_sort' => (int)$mybb->input['order']
+          );
+          $db->insert_query("relas_subcategories_default", $insert_array);
+          flash_message($lang->relations_addsubcat_success, 'success');
+          admin_redirect("index.php?module=rpgstuff-relations&amp;action=relations_add_subcats");
+        }
+      }
+      // fehleranzeige
+      if (isset($errors)) {
+        $page->output_inline_error($errors);
+      }
+
+      //formalar zum hinzufügen erstellen
+      $form = new Form("index.php?module=rpgstuff-relations&amp;action=relations_add_subcats", "post", "", 1);
+      $form_container = new FormContainer($lang->relations_acp_addsubcats);
+      //Name der Kategorie
+      $form_container->output_row(
+        $lang->relations_addsubcat_name, //Name
+        $lang->relations_addsubcat_name_descr,
+        $form->generate_text_box('name', "", array('required' => true))
+      );
+      //Hauptkategorie zu der die Unterkategorie gehören soll
+      $main_cats = $db->simple_select("relas_categories_default", "*");
+      $main_cat_options = array();
+      while ($main_cat = $db->fetch_array($main_cats)) {
+        $main_cat_options[$main_cat['cd_id']] = $main_cat['cd_name'];
+      }
+      //über add aus der verwalunt -> hauptkategorie wird übergeben und somit vorausgewählt
+      $selected_cat = $mybb->get_input('cid') ? (int)$mybb->get_input('cid') : '';
+      $form_container->output_row(
+        $lang->relations_addsubcat_maincat, //Hauptkategorie
+        $lang->relations_addsubcat_maincat_descr,
+        $form->generate_select_box('cid', $main_cat_options, $selected_cat, array('id' => 'maincat_select', 'required' => true))
+      );
+
+      //reihenfolge der unterkategorien innerhalb einer hauptkategorie festlegen
+      $form_container->output_row(
+        $lang->relations_addsubcat_order, //Reihenfolge numerisch
+        $lang->relations_addsubcat_order_descr,
+        $form->generate_numeric_field('order', 1, array('min' => 0))
+      );
+      $form_container->end();
+      $buttons[] = $form->generate_submit_button($lang->relations_btn_add);
+      $form->output_submit_wrapper($buttons);
+      $form->end();
+      $page->output_footer();
+
+      die();
+    }
+
+    //Unterkategorie bearbeiten
+    if ($mybb->get_input('action') == "relations_subcat_edit") {
+      if ($mybb->request_method == "post") {
+        $id = (int)$mybb->get_input('id');
+        if (empty($mybb->input['name'])) {
+          $errors[] = $lang->relations_addsubcat_error_noname;
+        }
+        if (strlen($mybb->input['name']) > 50) {
+          $errors[] = $lang->relations_addsubcat_error_longname;
+        }
+        if (empty($mybb->input['cid'])) {
+          $errors[] = $lang->relations_addsubcat_error_nocat;
+        }
+        // Überprüfen, ob es die Kategorie schon gibt
+        $existing_subcat = $db->fetch_field($db->simple_select(
+          "relas_subcategories_default",
+          "scd_id",
+          "scd_name = '" . $db->escape_string($mybb->input['name']) . "' 
+        AND scd_cdid = '" . (int)$mybb->input['cid'] . "' 
+        AND scd_id != '{$id}' 
+        "
+        ), "scd_id");
+        if ($existing_subcat) {
+          $errors[] = $lang->relations_addsubcat_error_exists;
+        }
+        // Wenn keine Fehler, dann speichern
+        if (!isset($errors)) {
+          $update_array = array(
+            'scd_name' => $db->escape_string($mybb->input['name']),
+            'scd_cdid' => (int)$mybb->input['cid'],
+            'scd_sort' => (int)$mybb->input['order']
+          );
+          $db->update_query("relas_subcategories_default", $update_array, "scd_id = '{$id}'");
+          flash_message($lang->relations_editsubcat_success, 'success');
+          admin_redirect("index.php?module=rpgstuff-relations");
+        }
+      }
+      // fehleranzeige
+      if (isset($errors)) {
+        $page->output_inline_error($errors);
+      }
+
+      $page->add_breadcrumb_item($lang->relations_acp_editsubcat);
+      $page->output_header($lang->relations_acp_editsubcat);
+      $sub_tabs = relations_do_submenu("edit_subcat");
+      $page->output_nav_tabs($sub_tabs, 'relations_edit_subcat');
+      $id = (int)$mybb->get_input('id');
+      $subcategory = $db->fetch_array($db->simple_select("relas_subcategories_default", "*", "scd_id = '{$id}'"));
+      //formular zum bearbeiten erstellen
+      $form = new Form("index.php?module=rpgstuff-relations&amp;action=relations_subcat_edit&amp;id={$id}", "post", "", 1);
+      $form_container = new FormContainer($lang->relations_acp_editsubcat);
+      //Name der Kategorie
+      $form_container->output_row(
+        $lang->relations_addsubcat_name, //Name
+        $lang->relations_addsubcat_name_descr,
+        $form->generate_text_box('name', $subcategory['scd_name'], array('required' => true))
+      );
+      //Hauptkategorie zu der die Unterkategorie gehören soll
+      $main_cats = $db->simple_select("relas_categories_default", "*");
+      $main_cat_options = array();
+      while ($main_cat = $db->fetch_array($main_cats)) {
+        $main_cat_options[$main_cat['cd_id']] = $main_cat['cd_name'];
+      }
+      //über add aus der verwalunt -> hauptkategorie wird übergeben und somit vorausgewählt
+      $selected_cat = $mybb->get_input('cid') ? (int)$mybb->get_input('cid') : $subcategory['scd_cdid'];
+      $form_container->output_row(
+        $lang->relations_addsubcat_maincat, //Hauptkategorie
+        $lang->relations_addsubcat_maincat_descr,
+        $form->generate_select_box('cid', $main_cat_options, $selected_cat, array('id' => 'maincat_select', 'required' => true))
+      );
+      //reihenfolge der unterkategorien innerhalb einer hauptkategorie festlegen
+      $form_container->output_row(
+        $lang->relations_addsubcat_order, //Reihenfolge numerisch
+        $lang->relations_addsubcat_order_descr,
+        $form->generate_numeric_field('order', $subcategory['scd_sort'], array('min' => 0))
+      );
+      $form_container->end();
+      $buttons[] = $form->generate_submit_button($lang->relations_btn_save);
+      $form->output_submit_wrapper($buttons);
+      $form->end();
+      $page->output_footer();
+      die();
+    }
+  }
+}
+
+function relations_do_submenu($type = "")
+{
+  global $lang;
+  $lang->load("relations");
+  //Übersicht
+  $sub_tabs['relations'] = [
+    "title" => $lang->relations_acp_overview,
+    "link" => "index.php?module=rpgstuff-relations",
+    "description" => "Übersicht der Default Haupt-und Unterkategorien. Hier können keine Kategorien angelegt werden, sondern nur die bestehenden bearbeitet oder gelöscht werden. <b>Beachte das Änderungen nur für zukünftig angelegte Standardkategorien gelten.</b>"
+  ];
+  $sub_tabs['relations_add_cats'] = [
+    "title" => $lang->relations_acp_addcats,
+    "link" => "index.php?module=rpgstuff-relations&amp;action=relations_add_cats",
+    "description" => "Füge hier eine neue Hauptkategorie hinzu."
+  ];
+  $sub_tabs['relations_add_subcats'] = [
+    "title" => $lang->relations_acp_addsubcats,
+    "link" => "index.php?module=rpgstuff-relations&amp;action=relations_add_subcats",
+    "description" => "Füge hier eine neue Unterkategorie hinzu."
+  ];
+  if ($type == "edit_maincat") {
+    $sub_tabs['relations_edit_maincat'] = [
+      "title" => $lang->relations_acp_editmaincat,
+      "link" => "#",
+      "description" => "Bearbeite hier eine Hauptkategorie. <b>Beachte das Änderungen nur für zukünftig angelegte Standardkategorien gelten.</b> User die schon Kategorien erstellt haben, behalten diese und müssen sie manuell bearbeiten wenn nötig."
+    ];
+  }
+  if ($type == "edit_subcat") {
+    $sub_tabs['relations_edit_subcat'] = [
+      "title" => $lang->relations_acp_editsubcat,
+      "link" => "#",
+      "description" => "Bearbeite hier eine Unterkategorie."
+    ];
+  }
+  return $sub_tabs;
+}
 /*********************
  * UPDATE KRAM
  *********************/
@@ -2650,68 +3456,24 @@ function relations_admin_update_plugin(&$table)
     relations_addtemplates("update");
 
     //templates bearbeiten wenn nötig
-    relations_replace_templates();
+    require_once MYBB_ROOT . "inc/plugins/risuena_updates/risuena_updatefile.php";
+    risuenaupdatefile_replace_templates(relations_updated_templates());
 
     //Datenbank updaten
-    relations_add_db("update");
+    relations_add_db();
 
     //Stylesheet hinzufügen wenn nötig:
-    //array mit updates bekommen.
-    $update_data_all = relations_stylesheet_update();
     //alle Themes bekommen
     $theme_query = $db->simple_select('themes', 'tid, name');
     require_once MYBB_ADMIN_DIR . "inc/functions_themes.php";
-
-    while ($theme = $db->fetch_array($theme_query)) {
-      //wenn im style nicht vorhanden, dann gesamtes css hinzufügen
-      $templatequery = $db->write_query("SELECT * FROM `" . TABLE_PREFIX . "themestylesheets` where tid = '{$theme['tid']}' and name ='relations.css'");
-
-      if ($db->num_rows($templatequery) == 0) {
-        $css = relations_css($theme['tid']);
-
-        $sid = $db->insert_query("themestylesheets", $css);
-        $db->update_query("themestylesheets", array("cachefile" => "relations.css"), "sid = '" . $sid . "'", 1);
-        update_theme_stylesheet_list($theme['tid']);
-      }
-
-      //testen ob updatestring vorhanden - sonst an css in theme hinzufügen
-      $update_data_all = relations_stylesheet_update();
-      //array durchgehen mit eventuell hinzuzufügenden strings
-      foreach ($update_data_all as $update_data) {
-        //hinzuzufügegendes css
-        $update_stylesheet = $update_data['stylesheet'];
-        //String bei dem getestet wird ob er im alten css vorhanden ist
-        $update_string = $update_data['update_string'];
-        //updatestring darf nicht leer sein
-        if (!empty($update_string)) {
-          //checken ob updatestring in css vorhanden ist - dann muss nichts getan werden
-          $test_ifin = $db->write_query("SELECT stylesheet FROM " . TABLE_PREFIX . "themestylesheets WHERE tid = '{$theme['tid']}' AND name = 'relations.css' AND stylesheet LIKE '%" . $update_string . "%' ");
-          //string war nicht vorhanden
-          if ($db->num_rows($test_ifin) == 0) {
-            //altes css holen
-            $oldstylesheet = $db->fetch_field($db->write_query("SELECT stylesheet FROM " . TABLE_PREFIX . "themestylesheets WHERE tid = '{$theme['tid']}' AND name = 'relations.css'"), "stylesheet");
-            //Hier basteln wir unser neues array zum update und hängen das neue css hinten an das alte dran
-            $updated_stylesheet = array(
-              "cachefile" => $db->escape_string('relations.css'),
-              "stylesheet" => $db->escape_string($oldstylesheet . "\n\n" . $update_stylesheet),
-              "lastmodified" => TIME_NOW
-            );
-            $db->update_query("themestylesheets", $updated_stylesheet, "name='relations.css' AND tid = '{$theme['tid']}'");
-            echo "In Theme mit der ID {$theme['tid']} wurde CSS hinzugefügt -  $update_string <br>";
-          }
-        }
-        update_theme_stylesheet_list($theme['tid']);
-      }
-    }
+    risuenaupdatefile_update_stylesheet("relations", relations_stylesheet_update());
   }
 
   // Zelle mit dem Namen des Themes
   $table->construct_cell("<b>" . htmlspecialchars_uni("Relations") . "</b>", array('width' => '70%'));
 
   // Überprüfen, ob Update nötig ist 
-  $update_check = relations_is_updated();
-
-  if ($update_check) {
+  if (relations_is_updated()) {
     $table->construct_cell($lang->plugins_actual, array('class' => 'align_center'));
   } else {
     $table->construct_cell("<a href=\"index.php?module=rpgstuff-plugin_updates&action=add_update&plugin=relations\">" . $lang->plugins_update . "</a>", array('class' => 'align_center'));
@@ -2719,57 +3481,6 @@ function relations_admin_update_plugin(&$table)
 
   $table->construct_row();
 }
-
-/**
- * Funktion um CSS nachträglich oder nach einem MyBB Update wieder hinzuzufügen
- */
-$plugins->add_hook('admin_rpgstuff_update_stylesheet', "relations_admin_update_stylesheet");
-function relations_admin_update_stylesheet(&$table)
-{
-  global $db, $mybb, $lang;
-
-  $lang->load('rpgstuff_stylesheet_updates');
-
-  require_once MYBB_ADMIN_DIR . "inc/functions_themes.php";
-
-  // HINZUFÜGEN
-  if ($mybb->input['action'] == 'add_master' and $mybb->get_input('plugin') == "relations") {
-
-    $css = relations_css();
-
-    $sid = $db->insert_query("themestylesheets", $css);
-    $db->update_query("themestylesheets", array("cachefile" => "relations.css"), "sid = '" . $sid . "'", 1);
-
-    $tids = $db->simple_select("themes", "tid");
-    while ($theme = $db->fetch_array($tids)) {
-      update_theme_stylesheet_list($theme['tid']);
-    }
-
-    flash_message($lang->stylesheets_flash, "success");
-    admin_redirect("index.php?module=rpgstuff-stylesheet_updates");
-  }
-  // Zelle mit dem Namen des Themes
-  $table->construct_cell("<b>" . htmlspecialchars_uni("Relations-Manager") . "</b>", array('width' => '70%'));
-
-  // Ob im Master Style vorhanden
-  $master_check = $db->query("SELECT tid FROM " . TABLE_PREFIX . "themestylesheets 
-    WHERE name = 'relations.css' 
-    AND tid = 1");
-
-  if ($db->num_rows($master_check) > 0) {
-    $masterstyle = true;
-  } else {
-    $masterstyle = false;
-  }
-
-  if (!empty($masterstyle)) {
-    $table->construct_cell($lang->stylesheets_masterstyle, array('class' => 'align_center'));
-  } else {
-    $table->construct_cell("<a href=\"index.php?module=rpgstuff-stylesheet_updates&action=add_master&plugin=relations\">" . $lang->stylesheets_add . "</a>", array('class' => 'align_center'));
-  }
-  $table->construct_row();
-}
-
 
 /**
  * Stylesheet der eventuell hinzugefügt werden muss
@@ -2789,76 +3500,6 @@ function relations_stylesheet_update()
 
   return $update_array_all;
 }
-
-/**
- * Funktion um alte Templates des Plugins bei Bedarf zu aktualisieren
- */
-function relations_replace_templates()
-{
-  global $db;
-  //Wir wollen erst einmal die templates, die eventuellverändert werden müssen
-  $update_template_all = relations_updated_templates();
-  if (!empty($update_template_all)) {
-    //diese durchgehen
-    foreach ($update_template_all as $update_template) {
-      //anhand des templatenames holen
-      $old_template_query = $db->simple_select("templates", "tid, template", "title = '" . $update_template['templatename'] . "'");
-      //in old template speichern
-      while ($old_template = $db->fetch_array($old_template_query)) {
-        //was soll gefunden werden? das mit pattern ersetzen (wir schmeißen leertasten, tabs, etc raus)
-
-        if ($update_template['action'] == 'replace') {
-          $pattern = relations_createRegexPattern($update_template['change_string']);
-        } elseif ($update_template['action'] == 'add') {
-          //bei add wird etwas zum template hinzugefügt, wir müssen also testen ob das schon geschehen ist
-          $pattern = relations_createRegexPattern($update_template['action_string']);
-        } elseif ($update_template['action'] == 'overwrite') {
-          $pattern = relations_createRegexPattern($update_template['change_string']);
-        }
-
-        //was soll gemacht werden -> momentan nur replace 
-        if ($update_template['action'] == 'replace') {
-          //wir ersetzen wenn gefunden wird
-          if (preg_match($pattern, $old_template['template'])) {
-            $template = preg_replace($pattern, $update_template['action_string'], $old_template['template']);
-            $update_query = array(
-              "template" => $db->escape_string($template),
-              "dateline" => TIME_NOW
-            );
-            $db->update_query("templates", $update_query, "tid='" . $old_template['tid'] . "'");
-            echo ("Template -replace- {$update_template['templatename']} in {$old_template['tid']} wurde aktualisiert <br>");
-          }
-        }
-        if ($update_template['action'] == 'add') { //hinzufügen nicht ersetzen
-          //ist es schon einmal hinzugefügt wurden? nur ausführen, wenn es noch nicht im template gefunden wird
-          if (!preg_match($pattern, $old_template['template'])) {
-            $pattern_rep = relations_createRegexPattern($update_template['change_string']);
-            $template = preg_replace($pattern_rep, $update_template['action_string'], $old_template['template']);
-            $update_query = array(
-              "template" => $db->escape_string($template),
-              "dateline" => TIME_NOW
-            );
-            $db->update_query("templates", $update_query, "tid='" . $old_template['tid'] . "'");
-            echo ("Template -add- {$update_template['templatename']} in  {$old_template['tid']} wurde aktualisiert <br>");
-          }
-        }
-        if ($update_template['action'] == 'overwrite') { //komplett ersetzen
-          //checken ob das bei change string angegebene vorhanden ist - wenn ja wurde das template schon überschrieben, wenn nicht überschreiben wir das ganze template
-          if (!preg_match($pattern, $old_template['template'])) {
-            $template = $update_template['action_string'];
-            $update_query = array(
-              "template" => $db->escape_string($template),
-              "dateline" => TIME_NOW
-            );
-            $db->update_query("templates", $update_query, "tid='" . $old_template['tid'] . "'");
-            echo ("Template -overwrite- {$update_template['templatename']} in  {$old_template['tid']} wurde aktualisiert <br>");
-          }
-        }
-      }
-    }
-  }
-}
-
 
 /**
  * Hier werden Templates gespeichert, die im Laufe der Entwicklung aktualisiert wurden
@@ -2885,24 +3526,6 @@ function relations_updated_templates()
   return $update_template;
 }
 
-
-/**
- * Funktion um ein pattern für preg_replace zu erstellen
- * und so templates zu vergleichen.
- * @return string - pattern für preg_replace zum vergleich
- */
-function relations_createRegexPattern($html)
-{
-  // Entkomme alle Sonderzeichen und ersetze Leerzeichen mit flexiblen Platzhaltern
-  $pattern = preg_quote($html, '/');
-
-  // Ersetze Leerzeichen in `class`-Attributen mit `\s+` (flexible Leerzeichen)
-  $pattern = preg_replace('/\s+/', '\\s+', $pattern);
-
-  // Passe das Muster an, um Anfang und Ende zu markieren
-  return '/' . $pattern . '/si';
-}
-
 /**
  * Update Check
  * @return boolean false wenn Plugin nicht aktuell ist
@@ -2911,34 +3534,46 @@ function relations_createRegexPattern($html)
 function relations_is_updated()
 {
   global $db, $mybb;
+  require_once MYBB_ROOT . "inc/plugins/risuena_updates/risuena_updatefile.php";
 
+  $needupdate = 0;
+  $start_updatebox = '<div style="max-height: 200px;padding: 5px; margin-bottom:10px; overflow: auto; background: #efefef;"><h2>Relationsplugin v3 updates:</h2>';
+  $text = "";
+  //Tabellen Schema allgemein prüfen:
+  if (!risuenaupdatefile_check_schema(relations_db_schema())) {
+    echo "check";
+    $text .= "Das Datenbankschema ist nicht aktuell<br>";
+    $needupdate = 1;
+  }
+  // relas_autoaccept
+  if (!$db->field_exists("relas_autoaccept", "users")) {
+    $text .= "relas_autoaccept muss zu users tabelle hinzugefügt werden<br>";
+    $needupdate = 1;
+  }
+  if (!$db->field_exists("r_searchurl", "relas_entries")) {
+    $text .= "r_searchurl muss zu relas_entries tabelle hinzugefügt werden<br>";
+    $needupdate = 1;
+  }
   //Testen ob im CSS etwas fehlt
   $update_data_all = relations_stylesheet_update();
   //alle Themes bekommen
   $theme_query = $db->simple_select('themes', 'tid, name');
+
   while ($theme = $db->fetch_array($theme_query)) {
-    //wenn im style nicht vorhanden, dann gesamtes css hinzufügen
-    $templatequery = $db->write_query("SELECT * FROM `" . TABLE_PREFIX . "themestylesheets` where tid = '{$theme['tid']}' and name ='relations.css'");
-    //relations.css ist in keinem style nicht vorhanden
-    if ($db->num_rows($templatequery) == 0) {
-      echo ("Nicht im {$theme['tid']} vorhanden <br>");
-      return false;
-    } else {
-      //relations.css ist in einem style nicht vorhanden
-      //css ist vorhanden, testen ob alle updatestrings vorhanden sind
-      $update_data_all = relations_stylesheet_update();
-      //array durchgehen mit eventuell hinzuzufügenden strings
-      foreach ($update_data_all as $update_data) {
-        //String bei dem getestet wird ob er im alten css vorhanden ist
-        $update_string = $update_data['update_string'];
-        //updatestring darf nicht leer sein
-        if (!empty($update_string)) {
-          //checken ob updatestring in css vorhanden ist - dann muss nichts getan werden
-          $test_ifin = $db->write_query("SELECT stylesheet FROM " . TABLE_PREFIX . "themestylesheets WHERE tid = '{$theme['tid']}' AND name = 'relations.css' AND stylesheet LIKE '%" . $update_string . "%' ");
-          //string war nicht vorhanden
-          if ($db->num_rows($test_ifin) == 0) {
-            echo ("Mindestens Theme {$theme['tid']} muss aktualisiert werden <br>");
-            return false;
+    foreach ($update_data_all as $update_data) {
+      $update_stylesheet = $update_data['stylesheet'];
+      $update_string = $update_data['update_string'];
+      if (!empty($update_string)) {
+        $test_ifin = $db->write_query("SELECT stylesheet FROM " . TABLE_PREFIX . "themestylesheets WHERE tid = '{$theme['tid']}' AND name = 'relations.css' AND stylesheet LIKE '%" . $update_string . "%' ");
+        if ($db->num_rows($test_ifin) == 0) {
+          if (!empty($update_string)) {
+            //checken ob updatestring in css vorhanden ist - dann muss nichts getan werden
+            $test_ifin = $db->write_query("SELECT stylesheet FROM " . TABLE_PREFIX . "themestylesheets WHERE tid = '{$theme['tid']}' AND name = 'relations.css' AND stylesheet LIKE '%" . $update_string . "%' ");
+            //string war nicht vorhanden
+            if ($db->num_rows($test_ifin) == 0) {
+              $text .= "Relations: Mindestens Theme {$theme['tid']} muss aktualisiert werden (update string: '$update_string') <br>";
+              $needupdate = 1;
+            }
           }
         }
       }
@@ -2948,6 +3583,7 @@ function relations_is_updated()
   //Testen ob eins der Templates aktualisiert werden muss
   //Wir wollen erst einmal die templates, die eventuellverändert werden müssen
   $update_template_all = relations_updated_templates();
+
   //alle themes durchgehen
   foreach ($update_template_all as $update_template) {
     //entsprechendes Tamplate holen
@@ -2955,25 +3591,88 @@ function relations_is_updated()
     while ($old_template = $db->fetch_array($old_template_query)) {
       //pattern bilden
       if ($update_template['action'] == 'replace') {
-        $pattern = relations_createRegexPattern($update_template['change_string']);
+        $pattern = risuenaupdatefile_createRegexPattern($update_template['change_string']);
         $check = preg_match($pattern, $old_template['template']);
       } elseif ($update_template['action'] == 'add') {
         //bei add wird etwas zum template hinzugefügt, wir müssen also testen ob das schon geschehen ist
-        $pattern = relations_createRegexPattern($update_template['action_string']);
+        $pattern = risuenaupdatefile_createRegexPattern($update_template['action_string']);
         $check = !preg_match($pattern, $old_template['template']);
       } elseif ($update_template['action'] == 'overwrite') {
         //checken ob das bei change string angegebene vorhanden ist - wenn ja wurde das template schon überschrieben
-        $pattern = relations_createRegexPattern($update_template['change_string']);
+        $pattern = risuenaupdatefile_createRegexPattern($update_template['change_string']);
         $check = !preg_match($pattern, $old_template['template']);
       }
       //testen ob der zu ersetzende string vorhanden ist
       //wenn ja muss das template aktualisiert werden.
       if ($check) {
         $templateset = $db->fetch_field($db->simple_select("templatesets", "title", "sid = '{$old_template['sid']}'"), "title");
-        echo ("Template {$update_template['templatename']} im Set {$templateset}'(SID: {$old_template['sid']}') muss aktualisiert werden.");
-        return false;
+        $text .= "Relations: Template {$update_template['templatename']} im Template-Set {$templateset}'(SID: {$old_template['sid']}') muss aktualisiert werden. ({$update_template['change_string']} zu {$update_template['action_string']})<br>";
+        $needupdate = 1;
       }
     }
   }
+
+  $setting_array = relations_settings_array();
+  $gid = $db->fetch_field($db->simple_select("settinggroups", "gid", "name = 'relations'"), "gid");
+
+  foreach ($setting_array as $name => $setting) {
+    $setting['name'] = $name;
+    $setting['gid'] = $gid;
+    $check2 = $db->write_query("SELECT * FROM `" . TABLE_PREFIX . "settings` WHERE name = '{$name}'");
+    if ($db->num_rows($check2) > 0) {
+      while ($setting_old = $db->fetch_array($check2)) {
+        if (
+          $setting_old['title'] != $setting['title'] ||
+          stripslashes($setting_old['description']) != stripslashes($setting['description']) ||
+          $setting_old['optionscode'] != $setting['optionscode'] ||
+          $setting_old['disporder'] != $setting['disporder']
+        ) {
+          $text .= "Relations: Setting: {$name} muss aktualisiert werden.<br>";
+          $needupdate = 1;
+        }
+      }
+    } else {
+      $text .= "Relations: Setting: {$name} muss hinzugefügt werden.<br>";
+      $needupdate = 1;
+    }
+  }
+  $enddiv =  "</div>";
+  if ($needupdate == 1) {
+    echo $start_updatebox . $text . $enddiv;
+    return false;
+  }
   return true;
+}
+
+function relations_getjob($uid)
+{
+  global $db;
+  $job_string = "";
+  $job_query = $db->write_query("
+      SELECT je_uid, je_abteilung, je_position, js_title, jc_title FROM `mybb_jl_entry` 
+        LEFT JOIN `mybb_jl_subcat` on je_jsid = js_id 
+        LEFT JOIN mybb_jl_cat on js_subovercat= jc_id where je_uid = '{$uid}' ORDER BY je_id DESC LIMIT 1");
+
+
+  while ($job = $db->fetch_array($job_query)) {
+    $job_string .= "<span class=\"job_wrapper\">";
+    if (!empty($job['je_position'])) {
+      $job_string .= $job['je_position'] . " - ";
+    }
+    if (!empty($job['jc_title'])) {
+      $job_string .= $job['jc_title'] . " - ";
+    }
+    if (!empty($job['js_title'])) {
+      $job_string .= $job['js_title'] . " - ";
+    }
+    if (!empty($job['je_abteilung'])) {
+      $job_string .= $job['je_abteilung'] . " - ";
+    }
+  }
+  if (substr($job_string, -1) === ' ') {
+    $job_string = substr($job_string, 0, -2);
+  }
+  $job_string .= "</span>";
+
+  return $job_string;
 }
