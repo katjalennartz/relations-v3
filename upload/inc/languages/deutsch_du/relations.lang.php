@@ -3,8 +3,6 @@
  * Relations 1.0 Main Language File
  */
 
- //ACP
- //INFOS
 $l['relations_ucpnav'] = "Relations";
 $l['myalerts_setting_relation_request'] = "Relations: Bei einer neuen Anfrage.";
 $l['relation_request'] = "Du hast eine Relationanfrage von {1}. Bestätige wenn nötig oder schau sie in deinem UCP an.";
