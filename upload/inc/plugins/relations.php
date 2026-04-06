@@ -198,7 +198,34 @@ function relations_addtemplates($type = 'install')
   );
   $db->insert_query("templategroups", $templategrouparray);
 
-  //Templates hinzufügen
+
+  $templates = relations_template_array();
+
+  if ($type == 'update') {
+    foreach ($templates as $template) {
+      $query = $db->simple_select("templates", "tid, template", "title = '" . $template['title'] . "' AND sid = '-2'");
+      if ($db->num_rows($query) == 0) {
+        $db->insert_query("templates", $template);
+      }
+    }
+  } else {
+    foreach ($templates as $template) {
+      $check = $db->num_rows($db->simple_select("templates", "title", "title = '" . $template['title'] . "'"));
+      if ($check == 0) {
+        $db->insert_query("templates", $template);
+      }
+    }
+  }
+}
+
+/***
+ * Hier werden alle Templates in einem Array angelegt. 
+ * Für Updates und Installation
+ */
+
+function relations_template_array()
+{
+
   $templates[] = array(
     "title" => 'relas_guest_searchpn',
     "template" => '<div class="model-form">
@@ -614,127 +641,122 @@ function relations_addtemplates($type = 'install')
   $templates[] = array(
     "title" => 'relas_ucp_manage',
     "template" => '<h2 class="rela-heading2">Verwaltung</h2>
-<div class="ucprelas-manage">
-	<div class="ucprelas-manage__item ucprelas-managecats">
-		<h3 class="rela-heading3">Kategorien verwalten</h3>
-		{$relas_ucp_managecat}
-	</div>
+          <div class="ucprelas-manage">
+            <div class="ucprelas-manage__item ucprelas-managecats">
+              <h3 class="rela-heading3">Kategorien verwalten</h3>
+              {$relas_ucp_managecat}
+        </div>
+            <div class="ucprelas-manage__item ucprelas-addcats">
+              <div class="ucprelas-addcats__item ">
+                <h3 class="rela-heading3">Standards erstellen</h3>
+                <form  action="usercp.php?action=relations" id="catstandard" method="post" >
+                  {$dostandardcats}
+                </form>
+              </div>
+              <div class="ucprelas-addcats__item ucprelas-addmaincats">
+                <h3 class="rela-heading3">Hauptkategorie erstellen</h3>
+                <form action="usercp.php?action=relations" id="newcat" method="post" >
+                  <label for="addMain">Bezeichnung Hauptkategorie</label>
+                  <input type="text" id="addMain" name="addMain" placeholder="Neue Hauptkategorie" required>
+                  <label for="addMainSort">Darstellungsreihenfolge</label>
+                  <input type="number" id="addMainSort" name="addMainSort" placeholder="Darstellungsreihenfolge">
+                  <input form="newcat" name="newcat" type="submit" value="Speichern" />
+                </form>
+              </div>
+              <div class="ucprelas-addcats__item ucprelas-addsubcats">
+                <h3 class="rela-heading3">Unterkategorie erstellen</h3>
+                <form  action="usercp.php?action=relations" id="newsubcat" method="post" >
+                  <label for="addSub">Bezeichnung Unterkategorie</label>
+                  <input type="text" name="addSub" id="addSub" placeholder="Neue Unterkategorie" required>
+                  <label for="addSubSort">Darstellungsreihenfolge</label>
+                  <input type="number" id="addSubSort" name="addSubSort" placeholder="Darstellungsreihenfolge">
+                  <label for="maincat">Hauptkategorie</label>
+                  {$hauptkategorie}
+                  <input form="newsubcat" name="newsubcat" type="submit" value="Speichern" />
+                </form>
 
-	<div class="ucprelas-manage__item ucprelas-addcats">
-		<div class="ucprelas-addcats__item ">
-			<h3 class="rela-heading3">Standards erstellen</h3>
-			<form  action="usercp.php?action=relations" id="catstandard" method="post" >
-				{$dostandardcats}
-			</form>
-		</div>
+              </div>
+            </div>
+              <div class="ucprelas-manage__item ucprelas-managecats">
+              <h3 class="rela-heading3">Einstellungen Alert</h3>
+              <form  action="usercp.php?action=relations" id="relconfirm_save" method="post" >
+                <p>Möchtest du Relations erst bestätigen, bevor sie bei anderen eingetragen werden?</p>
+                <input name="relaconfirm" value="0" type="radio" {$relaconfirm_yes} id="relaconfirmyes">
+                <label for="relaconfirmyes">Ja</label>
+                <input name="relaconfirm" value="1" type="radio" {$relaconfirm_no} id="relaconfirmno">
+                <label for="relaconfirmyes">Nein</label>
+                <input form="relconfirm_save" name="relconfirm_save" type="submit" value="Speichern" />
+              </form>
+            </div>
+            <div class="ucprelas-manage__item ucprelas-addcharas" >
+              <div class="ucprelas-npcform">
+                <form action="usercp.php?action=relations" method="post" >
+                  <h3 class="rela-heading3">NPC hinzufügen</h3>
+                  <div class="ucprelas-npcform__item">
+                    <label for="npcname">Name NPC</label>
+                    <input type="text" name="npcname" placeholder="NPC Name" id="npcname" value="" required>
+                  </div>
+                  <div class="ucprelas-npcform__item">
+                    <label for="npcbirthyear">Geburtsjahr NPC</label>
+                    <input type="number" name="npcbirthyear" placeholder="NPC Geburtsjahr" id="npcbirthyear" value="">
+                  </div>
+                                    <div class="ucprelas-npcform__item">
+                    <label for="npcdeathyear">Todesjahr NPC</label>
+                    <span class="smalltext">Wenn der NPC verstorben ist, gib hier das Todesjahr ein. Sonst einfach 0</span>
+                    <input type="number" name="npcdeathyear" placeholder="NPC Todesjahr" id="npcdeathyear" value="">
+                  </div>
+                  {$img}
+                  <div class="ucprelas-npcform__item">
+                    <label for="npcdescr">Beschreibung</label>
+                    <textarea name="npcdescr" placeholder="Kommentar zur Beziehung" id="npcdescr"></textarea>
+                  </div>
+                  <div class="ucprelas-npcform__item">
+                    <label for="addNpcSort">Darstellungsreihenfolge</label>
+                    <input type="number" id="addNpcSort" name="addNpcSort" placeholder="Darstellungsreihenfolge">
+                  </div>
+                  <div class="ucprelas-npcform__item">
+                    {$cats_npc}
+                  </div>
+                  <div class="ucprelas-npcform__item">
+                    <label>Darf übernommen werden?</label>
+                    <br>
+                    <div style="text-align:center">
+                      <input type="radio" name="rela_searched" checked="" id="e_rela_searched_yes" value="1">
+                      <label for="e_rela_searched_yes"> Ja</label>
+                      <input type="radio" name="rela_searched" id="e_rela_searched_no" value="0">
+                      <label for="e_rela_searched_no"> Nein</label>
+                    </div>
+                  </div>
+                  <div class="ucprelas-npcform__item">
+                    <input type="url" name="searchurl" placeholder="URL zum Gesuch">
+                  </div>
+                  <div class="ucprelas-npcform__item">
+                    <input type="submit" name="addnpc" value="speichern" id="addnpc" />
+                  </div>
+                </form>
+                <form action="usercp.php?action=relations" method="post" id="addachar" >
+                  <h3 class="rela-heading3">add another Character</h3>
+                  <div class="ucprelas-npcform__item">
+                    <input type="text" name="addname" placeholder="Charakter" id="username" value="" required>
+                  </div>
 
-		<div class="ucprelas-addcats__item ucprelas-addmaincats">
-			<h3 class="rela-heading3">Hauptkategorie erstellen</h3>
-			<form action="usercp.php?action=relations" id="newcat" method="post" >
-				<label for="addMain">Bezeichnung Hauptkategorie</label>
-				<input type="text" id="addMain" name="addMain" placeholder="Neue Hauptkategorie" required>
-				<label for="addMainSort">Darstellungsreihenfolge</label>
-				<input type="number" id="addMainSort" name="addMainSort" placeholder="Darstellungsreihenfolge">
-				<input form="newcat" name="newcat" type="submit" value="Speichern" />
-			</form>
-		</div>
+                  <div class="ucprelas-npcform__item">			
+                    <textarea name="addescr" placeholder="Kommentar zur Beziehung" id="npcdescr"></textarea>
+                  </div>
+                  <div class="ucprelas-npcform__item">
+                    <input type="number" name="addsort" placeholder="Darstellungsreihenfolge">
+                  </div>
+                  <div class="ucprelas-npcform__item">
+                    {$cats_npc}
+                  </div>
 
-		<div class="ucprelas-addcats__item ucprelas-addsubcats">
-			<h3 class="rela-heading3">Unterkategorie erstellen</h3>
-			<form  action="usercp.php?action=relations" id="newsubcat" method="post" >
-				<label for="addSub">Bezeichnung Unterkategorie</label>
-				<input type="text" name="addSub" id="addSub" placeholder="Neue Unterkategorie" required>
-				<label for="addSubSort">Darstellungsreihenfolge</label>
-				<input type="number" id="addSubSort" name="addSubSort" placeholder="Darstellungsreihenfolge">
-				<label for="maincat">Hauptkategorie</label>
-				{$hauptkategorie}
-				<input form="newsubcat" name="newsubcat" type="submit" value="Speichern" />
-			</form>
-		</div>
-	</div>
+                  <div class="ucprelas-npcform__item">
+                    <input type="submit" name="addachar_ucp" value="speichern" id="addachar_ucp" />
+                  </div>
+                </form>
 
-	<div class="ucprelas-manage__item ucprelas-manageoptions">
-		<h3 class="rela-heading3">Einstellungen Alert</h3>
-		<form  action="usercp.php?action=relations" id="relconfirm_save" method="post" >
-			<p>Möchtest du Relations erst bestätigen, bevor sie bei anderen eingetragen werden?</p>
-			<input name="relaconfirm" value="0" type="radio" {$relaconfirm_yes} id="relaconfirmyes">
-			<label for="relaconfirmyes">Ja</label>
-			<input name="relaconfirm" value="1" type="radio" {$relaconfirm_no} id="relaconfirmno">
-			<label for="relaconfirmyes">Nein</label>
-			<input form="relconfirm_save" name="relconfirm_save" type="submit" value="Speichern" />
-		</form>
-	</div>
-
-	<div class="ucprelas-manage__item ucprelas-addcharas" >
-		<div class="ucprelas-npcform">
-			<form action="usercp.php?action=relations" method="post" >
-				<h3 class="rela-heading3">NPC hinzufügen</h3>
-				<div class="ucprelas-npcform__item">
-					<label for="npcname">Name NPC</label>
-					<input type="text" name="npcname" placeholder="NPC Name" id="npcname" value="" required>
-				</div>
-				<div class="ucprelas-npcform__item">
-					<label for="npcbirthyear">Geburtsjahr NPC</label>
-					<input type="number" name="npcbirthyear" placeholder="NPC Geburtsjahr" id="npcbirthyear" value="">
-				</div>
-				<div class="ucprelas-npcform__item">
-					<label for="npcdeathyear">Todesjahr NPC</label>
-					<span class="smalltext">Wenn der NPC verstorben ist, gib hier das Todesjahr ein. Sonst einfach 0</span>
-					<input type="number" name="npcdeathyear" placeholder="NPC Todesjahr" id="npcdeathyear" value="">
-				</div>
-				{$img}
-				<div class="ucprelas-npcform__item">
-					<label for="npcdescr">Beschreibung</label>
-					<textarea name="npcdescr" placeholder="Kommentar zur Beziehung" id="npcdescr"></textarea>
-				</div>
-				<div class="ucprelas-npcform__item">
-					<label for="addNpcSort">Darstellungsreihenfolge</label>
-					<input type="number" id="addNpcSort" name="addNpcSort" placeholder="Darstellungsreihenfolge">
-				</div>
-				<div class="ucprelas-npcform__item">
-					{$cats_npc}
-				</div>
-				<div class="ucprelas-npcform__item">
-					<label>Darf übernommen werden?</label>
-					<br>
-					<div style="text-align:center">
-						<input type="radio" name="rela_searched" checked="" id="e_rela_searched_yes" value="1">
-						<label for="e_rela_searched_yes"> Ja</label>
-						<input type="radio" name="rela_searched" id="e_rela_searched_no" value="0">
-						<label for="e_rela_searched_no"> Nein</label>
-					</div>
-				</div>
-				<div class="ucprelas-npcform__item">
-					<input type="url" name="searchurl" placeholder="URL zum Gesuch">
-				</div>
-				<div class="ucprelas-npcform__item">
-					<input type="submit" name="addnpc" value="speichern" id="addnpc" />
-				</div>
-			</form>
-			<form action="usercp.php?action=relations" method="post" id="addachar" >
-				<h3 class="rela-heading3">add another Character</h3>
-				<div class="ucprelas-npcform__item">
-					<input type="text" name="addname" placeholder="Charakter" id="username" value="" required>
-				</div>
-
-				<div class="ucprelas-npcform__item">			
-					<textarea name="addescr" placeholder="Kommentar zur Beziehung" id="npcdescr"></textarea>
-				</div>
-				<div class="ucprelas-npcform__item">
-					<input type="number" name="addsort" placeholder="Darstellungsreihenfolge">
-				</div>
-				<div class="ucprelas-npcform__item">
-					{$cats_npc}
-				</div>
-
-				<div class="ucprelas-npcform__item">
-					<input type="submit" name="addachar_ucp" value="speichern" id="addachar_ucp" />
-				</div>
-			</form>
-
-		</div>
-	</div>
-</div>',
+              </div>
+            </div>',
     "sid" => "-2",
     "version" => "1.0",
     "dateline" => TIME_NOW
@@ -969,30 +991,7 @@ function relations_addtemplates($type = 'install')
     "dateline" => TIME_NOW
   );
 
-  if ($type == 'update') {
-    foreach ($templates as $template) {
-      $query = $db->simple_select("templates", "tid, template", "title = '" . $template['title'] . "' AND sid = '-2'");
-      $existing_template = $db->fetch_array($query);
-
-      if ($existing_template) {
-        if ($existing_template['template'] !== $template['template']) {
-          $db->update_query("templates", array(
-            'template' => $template['template'],
-            'dateline' => TIME_NOW
-          ), "tid = '" . $existing_template['tid'] . "'");
-        }
-      } else {
-        $db->insert_query("templates", $template);
-      }
-    }
-  } else {
-    foreach ($templates as $template) {
-      $check = $db->num_rows($db->simple_select("templates", "title", "title = '" . $template['title'] . "'"));
-      if ($check == 0) {
-        $db->insert_query("templates", $template);
-      }
-    }
-  }
+  return $templates;
 }
 
 function relations_settings_array()
@@ -1087,10 +1086,10 @@ function relations_settings_array()
       'disporder' => 12
     ),
     'relas_birthday' => array(
-      'title' => "Wie wird der Gebursjahr des Charakters angegeben?",
+      'title' => "Wie wird das Gebursjahr des Charakters angegeben?",
       'description' => $lang->relations_settings_group_scenetracker,
-      'optionscode' => "radio\nmybb=Mybb Geburtstagsfeld\nfid=Mybb Profilfeld\nrisu=Risuenas Steckbriefplugin",
-      'value' => 'fid', // Default
+      'optionscode' => "radio\nmybb=Mybb Geburtstagsfeld\nfid=Mybb Profilfeld\nrisu=Risuenas Steckbriefplugin\nnone=keine Altersausgabe",
+      'value' => 'none', // Default
       'disporder' => 13
     ),
     'relas_fid' => array(
@@ -1105,14 +1104,14 @@ function relations_settings_array()
       'description' => "Der eindeutige Bezeichner des Felds, wo der Geburtstag gespeichert wird. Muss als Typ date haben.",
       'optionscode' => "text",
       'value' => '0', // Default
-      'disporder' => 14
+      'disporder' => 15
     ),
     'relas_jobliste' => array(
       'title' => "Jobliste",
-      'description' => "Ihr verwendet die jobliste von risuena (https://github.com/katjalennartz/jobliste) dann könnt ihr den Job von Charakteren in den Relations automatisch mit ausgeben lassen. Einmal hier auf ja stellen.",
+      'description' => "Wenn ihr Risuenas Jobliste (https://github.com/katjalennartz/jobliste) verwendet, könnt ihr den Job von Charakteren in den Relations automatisch mit ausgeben lassen.",
       'optionscode' => "yesno",
       'value' => '0', // Default
-      'disporder' => 15
+      'disporder' => 16
     )
   );
   return $setting_array;
@@ -3001,10 +3000,15 @@ function relations_getage($uid)
       $output = $birthdate->format('Y-m-d');
     }
   }
-  // Nur berechnen, wenn Datum gültig ist
-  if ($birthdate instanceof DateTime) {
-    $age = $ingameTime->diff($birthdate);
-    $computedAge = $age->format('%Y Jahre');
+
+  if ($mybb->settings['relas_birthday'] !== 'none') {
+    // Nur berechnen, wenn Datum gültig ist
+    if ($birthdate instanceof DateTime) {
+      $age = $ingameTime->diff($birthdate);
+      $computedAge = $age->format('%Y Jahre');
+    }
+  } else {
+    $computedAge = '';
   }
   return  $computedAge;
 }
@@ -3487,6 +3491,53 @@ function relations_admin_rpgstuff_permissions(&$admin_permissions)
   $admin_permissions['relations'] = $lang->relations_permission;
 
   return $admin_permissions;
+}
+
+/**
+ * Funktion um CSS nachträglich oder nach einem MyBB Update wieder hinzuzufügen
+ */
+$plugins->add_hook('admin_rpgstuff_update_stylesheet', "relations_ucp_admin_update_stylesheet");
+function relations_ucp_admin_update_stylesheet(&$table)
+{
+  global $db, $mybb, $lang;
+
+  $lang->load('rpgstuff_stylesheet_updates');
+
+  require_once MYBB_ADMIN_DIR . "inc/functions_themes.php";
+  // HINZUFÜGEN
+  if ($mybb->input['action'] == 'add_master' and $mybb->get_input('plugin') == "relations") {
+
+    $css = application_ucp_css();
+
+    $sid = $db->insert_query("themestylesheets", $css);
+    $db->update_query("themestylesheets", array("cachefile" => "relations.css"), "sid = '" . $sid . "'", 1);
+
+    $tids = $db->simple_select("themes", "tid");
+    while ($theme = $db->fetch_array($tids)) {
+      update_theme_stylesheet_list($theme['tid']);
+    }
+
+    flash_message($lang->stylesheets_flash, "success");
+    admin_redirect("index.php?module=rpgstuff-stylesheet_updates");
+  }
+
+  // Zelle mit dem Namen des Themes
+  $table->construct_cell("<b>" . htmlspecialchars_uni("Relations-Manager") . "</b>", array('width' => '70%'));
+
+  // Ob im Master Style vorhanden
+  $master_check_test = $db->query("SELECT * FROM " . TABLE_PREFIX . "themestylesheets WHERE name = 'relations.css' AND tid = '1'");
+  if ($db->num_rows($master_check_test) > 0) {
+    $masterstyle = true;
+  } else {
+    $masterstyle = false;
+  }
+
+  if (!empty($masterstyle)) {
+    $table->construct_cell($lang->stylesheets_masterstyle, array('class' => 'align_center'));
+  } else {
+    $table->construct_cell("<a href=\"index.php?module=rpgstuff-stylesheet_updates&action=add_master&plugin=relations\">" . $lang->stylesheets_add . "</a>", array('class' => 'align_center'));
+  }
+  $table->construct_row();
 }
 
 
