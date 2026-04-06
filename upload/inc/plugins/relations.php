@@ -1079,15 +1079,15 @@ function relations_settings_array()
       'disporder' => 11
     ),
     'relas_ingamezeitraum' => array(
-      'title' => "Von welchem Ingamemonat und Jahr ausgehend soll das Alter berechnet werden? z.B. 2026-01 für Januar 2026",
-      'description' => $lang->relations_settings_group_scenetracker,
+      'title' => "Ingamezeitraum für Altersberechnung",
+      'description' => "Von welchem Ingamemonat und Jahr ausgehend soll das Alter berechnet werden? z.B. 2026-01 für Januar 2026",
       'optionscode' => 'text',
       'value' => '2026-01', // Default
       'disporder' => 12
     ),
     'relas_birthday' => array(
-      'title' => "Wie wird das Gebursjahr des Charakters angegeben?",
-      'description' => $lang->relations_settings_group_scenetracker,
+      'title' => "Eingabe Geburtstag",
+      'description' => "Wie wird das Gebursjahr des Charakters angegeben?",
       'optionscode' => "radio\nmybb=Mybb Geburtstagsfeld\nfid=Mybb Profilfeld\nrisu=Risuenas Steckbriefplugin\nnone=keine Altersausgabe",
       'value' => 'none', // Default
       'disporder' => 13
