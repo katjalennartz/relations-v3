@@ -5,7 +5,7 @@
 
 $l['relations_ucpnav'] = "Relations";
 $l['myalerts_setting_relation_request'] = "Relations: Bei einer neuen Anfrage.";
-$l['relation_request'] = "Du hast eine Relationanfrage von {1}. Bestätige wenn nötig oder schau sie in deinem UCP an.";
+$l['relation_request'] = "Du hast eine Relationanfrage von {1}. Bestätige wenn nötig oder schaue sie in deinem UCP an.";
 
 $l['myalerts_setting_relation_reminder'] = "Relations: Alert wenn ein User dich an eine Anfrage erinnern möchte.";
 $l['relation_reminder'] = "{1} hat dir schon vor einer Weile eine Anfrage geschickt.";
