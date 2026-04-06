@@ -78,14 +78,49 @@ Im ACP kannst du folgendes konfigurieren
 * Relations nach WOB? (Dürfen Relations erst nach dem WOB gestellt werden?)
 * Bewerbergruppe (Wie ist die Gruppe für die User die noch nicht angenommen sind?)
 * Ingamezeit (Von welchem Ingamemonat und Jahr ausgehend soll das Alter berechnet werden? z.B. 2026-01 für Januar 2026)
-* Wie wird der Gebursjahr des Charakters angegeben?
-* Jobliste (Ihr verwendet die jobliste von risuena (https://github.com/katjalennartz/jobliste) dann könnt ihr den Job von Charakteren in den Relations automatisch mit ausgeben lassen.)  
+* Wie wird der Gebursjahr des Charakters angegeben? (Profilfeld, Mybb Geburtstagsfeld, Steckbriefplugin)
+* Jobliste - Wenn ihr meine Jobliste (https://github.com/katjalennartz/jobliste) verwendet, könnt ihr den Job von Charakteren in den Relations automatisch mit ausgeben lassen.)  
 
 ---
 
-## Templates & Styling
+## Templates & Styling & Variablen
 
 Das Styling ist noch sehr rudimentär und muss angepasst werden.
+
+### eingefügte Variablen
+member_profile.tpl
+* $relas_memberprofil zeigt die Relations an
+* $relas_memberprofil_npcsearch zeigt eine Liste von den als gesucht markierten Charas an
+
+### erstellte templates
+* relas_guest_searchpn
+* relas_memberprofil
+* relas_memberprofil_anfrage
+* relas_memberprofil_cat
+* relas_memberprofil_entrybit
+* relas_memberprofil_npcsearch
+* relas_memberprofil_npcsearchurl
+* relas_memprofile_searchbit
+* relas_memberprofil_subcat
+* relas_ucp
+* relas_ucp_alluser
+* relas_ucp_cats
+* relas_ucp_editnpc
+* relas_ucp_denied
+* relas_ucp_denied_bit
+* relas_ucp_manage
+* relas_ucp_managecat
+* relas_ucp_managesubcat
+* relas_ucp_notadded
+* relas_ucp_notaddedbit
+* relas_ucp_subcats
+* relas_ucp_tablinks
+* relas_ucp_toaccept
+* relas_ucp_toaccept_bit
+* relas_ucp_waiting
+* relas_ucp_npc_editimg
+* relas_ucp_waiting_bit
+
 
 ---
 
