@@ -227,6 +227,32 @@ function relations_template_array()
 {
 
   $templates[] = array(
+    "title" => 'relas_avatar_npcava',
+    "template" => '<div class="entry__item ava"><img src="{$entry[\\\'r_npcimg\\\']"></div>
+    ',
+    "sid" => "-2",
+    "version" => "1.0",
+    "dateline" => TIME_NOW
+  );
+
+  $templates[] = array(
+    "title" => 'relas_avatar_userava',
+    "template" => '
+    <div class="entry__item ava"><img src="{$friend[\\\'avatar\\\']}"></div>
+     <!-- beispiel mit background img :  <div class="entry__item ava" style="background-image: url(\\\'{$friend[\\\'avatar\\\']}\\\');"></div> -->',
+    "sid" => "-2",
+    "version" => "1.0",
+    "dateline" => TIME_NOW
+  );
+
+  $templates[] = array(
+    "title" => 'relas_avatar_defaultava',
+    "template" => '<div class=\"entry__item ava\"><i class=\"fa-solid fa-circle-user\"></i></div>',
+    "sid" => "-2",
+    "version" => "1.0",
+    "dateline" => TIME_NOW
+  );
+  $templates[] = array(
     "title" => 'relas_guest_searchpn',
     "template" => '<div class="model-form">
           <label for="e_rela_npcname">Kontakt</label>
@@ -1439,15 +1465,12 @@ function relations_profile()
           if ($opt_npc_img == 1) {
             //dürfen gäste bilder sehen
             if ($thisuser == 0 && $opt_img_guest == 0) {
-              $rela_avatar = "<div class=\"entry__item avarund\"><i class=\"fa-solid fa-circle-user\"></i></div>";
+              eval("\$rela_avatar = \"" . $templates->get("relas_avatar_defaultava") . "\";");
             } else {
-              //ausgabe des bilds
-              $rela_avatar = "<div class=\"entry__item avarund\" style=\"background-image: url('{$entry['r_npcimg']}');\"></div>";
+              eval("\$rela_avatar = \"" . $templates->get("relas_avatar_npcava") . "\";");
             }
           } else {
-            //bilder dürfen nicht verwendet werden
-            // $rela_avatar = "";
-            $rela_avatar = "<div class=\"entry__item avarund\"><i class=\"fa-solid fa-circle-user\"></i></div>";
+            eval("\$rela_avatar = \"" . $templates->get("relas_avatar_defaultava") . "\";");
           }
           //name des npcs (wir wollen keinen link)
           $rela_name = $entry['r_npcname'];
@@ -1495,10 +1518,10 @@ function relations_profile()
           }
           // dürfen gäste avatare sehen
           if ($thisuser == 0 && $opt_img_guest == 0) {
-            $rela_avatar = "<div class=\"entry__item ava avarund\"><i class=\"fa-solid fa-circle-user\"></i></div>";
+            eval("\$rela_avatar = \"" . $templates->get("relas_avatar_defaultava") . "\";");
           } else {
             //ausgabe bild
-            $rela_avatar = "<div class=\"entry__item ava avarund\" style=\"background-image: url('{$friend['avatar']}');\"></div>";
+            eval("\$rela_avatar = \"" . $templates->get("relas_avatar_userava") . "\";");
           }
           //Existierender user -> wir wollen zum Profil verlinken
           $rela_name = build_profile_link($friend['username'], $friend['uid']);
