@@ -2466,9 +2466,11 @@ function relations_profile_wantednpcs()
     eval("\$relas_memberprofil_npcsearch = \"" . $templates->get("relas_memberprofil_npcsearch") . "\";");
     // $relation
 
+    if (empty($relauser['r_searchurl'])) {
       eval("\$relas_memprofile_searchbit .= \"" . $templates->get("relas_memprofile_searchbit") . "\";");
     }
   }
+}
 
 function relations_get_categories()
 {
