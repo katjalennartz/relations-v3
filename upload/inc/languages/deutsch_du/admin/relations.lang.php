@@ -17,9 +17,8 @@ $l['relations_settings_descr'] = "Einstellungen für Risuenas Relations Plugin";
 $l['relations_settings_alertConfirmTitle'] = "Relations Bestätigung";
 $l['relations_settings_alertConfirmDescr'] = "Müssen Anfragen anderer Charaktere bestätigt werden?";
 
-
 $l['relations_settings_alertAlertTitle'] = "Relations Alerts";
-$l['relations_settings_alertAlertDescr'] = "Sollen Alerts überhaupt benutzt werden? Das MyAlerts Plugin muss dafür installiert sein. Ansonsten bitte auch die Bestätigung auf nein stellen.";
+$l['relations_settings_alertAlertDescr'] = "Sollen Alerts überhaupt benutzt werden? Das MyAlerts Plugin muss dafür installiert sein.";
 
 $l['relations_settings_alertDeleteTitle'] = "Relations Löschung";
 $l['relations_settings_alertDeleteDescr'] = "Soll der User per Alert informiert werden, wenn eine Relation zu ihm gelöscht wird?";
