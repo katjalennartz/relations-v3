@@ -225,10 +225,23 @@ function relations_addtemplates($type = 'install')
 
 function relations_template_array()
 {
+  
+  $templates[] = array(
+    "title" => 'relas_ucp_npcimg',
+    "template" => '
+                <div class="ucprelas-npcform__item">
+                  <label for="npcdeathyear">Bild NPC</label>
+                  <input type="url" name="npcimg" placeholder="URL zum NPC Bild" id="npcimg" value="">
+                </div>
+    ',
+    "sid" => "-2",
+    "version" => "1.0",
+    "dateline" => TIME_NOW
+  );
 
   $templates[] = array(
     "title" => 'relas_avatar_npcava',
-    "template" => '<div class="entry__item ava"><img src="{$entry[\\\'r_npcimg\\\']}"></div>
+    "template" => '<div class="entry__item ava"><img src="{$entry[\\\'r_npcimg\\\']"></div>
     ',
     "sid" => "-2",
     "version" => "1.0",
@@ -1054,13 +1067,6 @@ function relations_settings_array()
       'value' => '0', // Default
       'disporder' => 4
     ),
-    'relas_img_width' => array(
-      'title' => $lang->relations_settings_imgWidthTitle,
-      'description' => $lang->relations_settings_imgWidthDescr,
-      'optionscode' => 'numeric',
-      'value' => '35', // Default
-      'disporder' => 5
-    ),
     'relas_npc' => array(
       'title' => $lang->relations_settings_npcTitle,
       'description' => $lang->relations_settings_npcDescr,
@@ -1704,6 +1710,10 @@ function relations_usercp()
   } else {
     $relaconfirm_yes = "";
     $relaconfirm_no = " checked";
+  }
+
+  if($mybb->settings['relas_npc_img'] == 1){
+    eval("\$img = \"" . $templates->get("relas_ucp_npcimg") . "\";");
   }
 
   //HauptKategorien bekommen
@@ -3705,6 +3715,16 @@ function relations_is_updated()
           }
         }
       }
+    }
+  }
+
+  //testen ob ein Template komplett fehlt
+  foreach( relations_template_array() as $template) {
+    $test = $db->write_query("SELECT * FROM " . TABLE_PREFIX . "templates WHERE title = '{$template['title']}' and sid = '-2'");
+  
+    if ($db->num_rows($test) == 0) {
+      $text .= "Relations: Template {$template['title']} fehlt komplett und muss hinzugefügt werden.<br>";
+      $needupdate = 1;
     }
   }
 
