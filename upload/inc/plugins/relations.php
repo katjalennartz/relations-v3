@@ -228,7 +228,7 @@ function relations_template_array()
 
   $templates[] = array(
     "title" => 'relas_avatar_npcava',
-    "template" => '<div class="entry__item ava"><img src="{$entry[\\\'r_npcimg\\\']"></div>
+    "template" => '<div class="entry__item ava"><img src="{$entry[\\\'r_npcimg\\\']}"></div>
     ',
     "sid" => "-2",
     "version" => "1.0",
