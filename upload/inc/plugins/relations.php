@@ -2572,13 +2572,13 @@ function relations_getuserucp($query, $all, $allsubs)
       // echo "r_npcbirthyear" . $relauser['r_npcbirthyear'];
       //TODO
 
-      eval("\$editname .= \"" . $templates->get("relas_ucp_editnpc") . "\";");
-      eval("\$editname_sail .= \"" . $templates->get("relas_ucp_editnpc") . "\";");
+      eval("\$editname = \"" . $templates->get("relas_ucp_editnpc") . "\";");
+      eval("\$editname_sail = \"" . $templates->get("relas_ucp_editnpc") . "\";");
 
       //Wenn Bilder für npcs erlaubt:
       if ($opt_npc_img == 1) {
         $userimg = $relauser['r_npcimg'];
-        eval("\$npc_editimg .= \"" . $templates->get("relas_ucp_npc_editimg") . "\";");
+        eval("\$npc_editimg = \"" . $templates->get("relas_ucp_npc_editimg") . "\";");
       } else {
         $userimg = "";
         $npc_editimg = "";
