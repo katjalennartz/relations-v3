@@ -3797,9 +3797,9 @@ function relations_getjob($uid)
   global $db;
   $job_string = "";
   $job_query = $db->write_query("
-      SELECT je_uid, je_abteilung, je_position, js_title, jc_title FROM `mybb_jl_entry` 
-        LEFT JOIN `mybb_jl_subcat` on je_jsid = js_id 
-        LEFT JOIN mybb_jl_cat on js_subovercat= jc_id where je_uid = '{$uid}' ORDER BY je_id DESC LIMIT 1");
+      SELECT je_uid, je_abteilung, je_position, js_title, jc_title FROM `" . TABLE_PREFIX . "jl_entry` 
+        LEFT JOIN `" . TABLE_PREFIX . "jl_subcat` on je_jsid = js_id 
+        LEFT JOIN " . TABLE_PREFIX . "jl_cat on js_subovercat= jc_id where je_uid = '{$uid}' ORDER BY je_id DESC LIMIT 1");
 
 
   while ($job = $db->fetch_array($job_query)) {
