@@ -1582,7 +1582,7 @@ function relations_profile()
       "toid" => $profilid,
       "signature" => 0,
     );
-    $pm['options'] = array(
+    $pm_change['options'] = array(
       'signature' => '0',
       'savecopy' => '0',
       'disablesmilies' => '0',
